@@ -10,6 +10,61 @@ namespace WpfToAvalonia.XamlParser.UnifiedAst;
 public sealed class UnifiedXamlDocument
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="UnifiedXamlDocument"/> class.
+    /// </summary>
+    public UnifiedXamlDocument()
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UnifiedXamlDocument"/> class from an XDocument.
+    /// </summary>
+    /// <param name="xmlDocument">The XML document to convert.</param>
+    /// <param name="diagnostics">Diagnostic collector.</param>
+    public UnifiedXamlDocument(XDocument xmlDocument, DiagnosticCollector? diagnostics = null)
+    {
+        XmlDocument = xmlDocument ?? throw new ArgumentNullException(nameof(xmlDocument));
+        DiagnosticCollector = diagnostics;
+
+        // Extract XML declaration info
+        if (xmlDocument.Declaration != null)
+        {
+            HasXmlDeclaration = true;
+            Encoding = xmlDocument.Declaration.Encoding ?? "UTF-8";
+        }
+
+        // Convert root element
+        if (xmlDocument.Root != null)
+        {
+            Root = UnifiedXamlElement.FromXElement(xmlDocument.Root, this);
+
+            // Extract namespace prefixes
+            ExtractNamespacePrefixes(xmlDocument.Root);
+        }
+    }
+
+    /// <summary>
+    /// Extracts namespace prefixes from the root element.
+    /// </summary>
+    private void ExtractNamespacePrefixes(XElement rootElement)
+    {
+        foreach (var attr in rootElement.Attributes())
+        {
+            if (attr.IsNamespaceDeclaration)
+            {
+                var prefix = attr.Name.LocalName;
+                var namespaceUri = attr.Value;
+
+                // xmlns="..." has prefix "xmlns"
+                if (attr.Name == XNamespace.Xmlns + "xmlns")
+                    prefix = "";
+
+                Symbols.RegisterNamespacePrefix(prefix, namespaceUri);
+            }
+        }
+    }
+
+    /// <summary>
     /// Gets or sets the root element of the document.
     /// </summary>
     public UnifiedXamlElement? Root { get; set; }

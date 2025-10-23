@@ -3,7 +3,8 @@
   <ItemGroup>
     <ProjectReference Include="..\WpfToAvalonia.Core\WpfToAvalonia.Core.csproj" />
     <ProjectReference Include="..\WpfToAvalonia.Mappings\WpfToAvalonia.Mappings.csproj" />
-    <!-- XamlX integration will be added later via wrapper -->
+    <!-- XamlX integration for semantic parsing -->
+    <ProjectReference Include="..\..\extern\XamlX\src\XamlX\XamlX.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
