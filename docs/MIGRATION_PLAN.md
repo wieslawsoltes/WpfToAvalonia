@@ -112,7 +112,7 @@ This document outlines a comprehensive plan for building an automated WPF to Ava
   - [x] 2.1.1.2 Add trivia preservation logic
   - [x] 2.1.1.3 Implement diagnostic reporting within rewriter
   - [x] 2.1.1.4 Create rewriter composition system
-  - [ ] 2.1.1.5 Add unit tests for base rewriter
+  - [x] 2.1.1.5 Add unit tests for base rewriter
 
 - [x] **2.1.2** Using directive transformation
   - [x] 2.1.2.1 Implement UsingDirectivesRewriter
@@ -120,7 +120,7 @@ This document outlines a comprehensive plan for building an automated WPF to Ava
   - [x] 2.1.2.3 Remove unused WPF-specific usings
   - [x] 2.1.2.4 Add required Avalonia namespaces
   - [x] 2.1.2.5 Preserve using aliases and handle conflicts
-  - [ ] 2.1.2.6 Test with various using patterns
+  - [x] 2.1.2.6 Test with various using patterns
 
 ### 2.2 Type Reference Transformation
 - [x] **2.2.1** Implement type reference rewriting
@@ -770,43 +770,43 @@ This document outlines a comprehensive plan for building an automated WPF to Ava
 ### 3.5.4 WPF Feature Compatibility Transformers
 **Goal**: Convert WPF-specific features (Triggers, EventTriggers, etc.) to Avalonia-compatible equivalents
 
-- [ ] **3.5.4.1** Trigger to Style Selector transformation
-  - [ ] 3.5.4.1.1 Convert simple property triggers to Avalonia style selectors with pseudoclasses
-  - [ ] 3.5.4.1.2 Map common trigger properties (IsMouseOver → :pointerover, IsPressed → :pressed, etc.)
-  - [ ] 3.5.4.1.3 Generate nested Style elements with selector syntax
-  - [ ] 3.5.4.1.4 Transform trigger setters to style setters
+- [x] **3.5.4.1** Trigger to Style Selector transformation
+  - [x] 3.5.4.1.1 Convert simple property triggers to Avalonia style selectors with pseudoclasses
+  - [x] 3.5.4.1.2 Map common trigger properties (IsMouseOver → :pointerover, IsPressed → :pressed, etc.)
+  - [x] 3.5.4.1.3 Generate nested Style elements with selector syntax
+  - [x] 3.5.4.1.4 Transform trigger setters to style setters
   - [ ] 3.5.4.1.5 Handle multiple conditions (AND logic) with compound selectors
-  - [ ] 3.5.4.1.6 Create fallback comments for unsupported trigger scenarios
+  - [x] 3.5.4.1.6 Create fallback comments for unsupported trigger scenarios
 
-- [ ] **3.5.4.2** DataTrigger to behavior transformation
-  - [ ] 3.5.4.2.1 Analyze DataTrigger binding and value
-  - [ ] 3.5.4.2.2 Generate Avalonia.Xaml.Interactions DataTriggerBehavior
-  - [ ] 3.5.4.2.3 Convert trigger actions to behavior actions
-  - [ ] 3.5.4.2.4 Add xmlns:i namespace for interactions
-  - [ ] 3.5.4.2.5 Preserve binding paths and converters
-  - [ ] 3.5.4.2.6 Document manual conversion requirements
+- [x] **3.5.4.2** DataTrigger to behavior transformation
+  - [x] 3.5.4.2.1 Analyze DataTrigger binding and value
+  - [x] 3.5.4.2.2 Generate Avalonia.Xaml.Interactions DataTriggerBehavior
+  - [x] 3.5.4.2.3 Convert trigger actions to behavior actions
+  - [x] 3.5.4.2.4 Add xmlns:i namespace for interactions
+  - [x] 3.5.4.2.5 Preserve binding paths and converters
+  - [x] 3.5.4.2.6 Document manual conversion requirements
 
-- [ ] **3.5.4.3** EventTrigger to animation transformation
-  - [ ] 3.5.4.3.1 Parse EventTrigger and identify event
-  - [ ] 3.5.4.3.2 Convert Storyboard animations to Avalonia Animations
-  - [ ] 3.5.4.3.3 Transform animation targets and properties
-  - [ ] 3.5.4.3.4 Map easing functions to Avalonia equivalents
-  - [ ] 3.5.4.3.5 Generate code-behind event handler if needed
-  - [ ] 3.5.4.3.6 Add Avalonia.Animation namespace
+- [x] **3.5.4.3** EventTrigger to animation transformation
+  - [x] 3.5.4.3.1 Parse EventTrigger and identify event
+  - [x] 3.5.4.3.2 Convert Storyboard animations to Avalonia Animations
+  - [x] 3.5.4.3.3 Transform animation targets and properties
+  - [x] 3.5.4.3.4 Map easing functions to Avalonia equivalents
+  - [x] 3.5.4.3.5 Generate code-behind event handler if needed
+  - [x] 3.5.4.3.6 Add Avalonia.Animation namespace
 
-- [ ] **3.5.4.4** MultiTrigger to composite selector transformation
-  - [ ] 3.5.4.4.1 Analyze MultiTrigger conditions
-  - [ ] 3.5.4.4.2 Generate composite style selector (e.g., ":pointerover:pressed")
-  - [ ] 3.5.4.4.3 Transform setters to nested style
-  - [ ] 3.5.4.4.4 Handle complex condition combinations
-  - [ ] 3.5.4.4.5 Add warning if no direct mapping exists
+- [x] **3.5.4.4** MultiTrigger to composite selector transformation
+  - [x] 3.5.4.4.1 Analyze MultiTrigger conditions
+  - [x] 3.5.4.4.2 Generate composite style selector (e.g., ":pointerover:pressed")
+  - [x] 3.5.4.4.3 Transform setters to nested style
+  - [x] 3.5.4.4.4 Handle complex condition combinations
+  - [x] 3.5.4.4.5 Add warning if no direct mapping exists
 
-- [ ] **3.5.4.5** VisualStateManager to Avalonia Styles transformation
-  - [ ] 3.5.4.5.1 Parse VisualStateManager groups and states
-  - [ ] 3.5.4.5.2 Convert visual states to Avalonia style classes
-  - [ ] 3.5.4.5.3 Transform state transitions to Avalonia transitions
-  - [ ] 3.5.4.5.4 Generate GoToStateAction equivalents
-  - [ ] 3.5.4.5.5 Map common control states to Avalonia patterns
+- [x] **3.5.4.5** VisualStateManager to Avalonia Styles transformation
+  - [x] 3.5.4.5.1 Parse VisualStateManager groups and states
+  - [x] 3.5.4.5.2 Convert visual states to Avalonia style classes
+  - [x] 3.5.4.5.3 Transform state transitions to Avalonia transitions
+  - [x] 3.5.4.5.4 Generate GoToStateAction equivalents
+  - [x] 3.5.4.5.5 Map common control states to Avalonia patterns
 
 - [ ] **3.5.4.6** Style to ControlTheme transformation (optional)
   - [ ] 3.5.4.6.1 Analyze Style with ControlTemplate

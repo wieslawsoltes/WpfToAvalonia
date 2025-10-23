@@ -1615,6 +1615,34 @@ Each state group should be evaluated individually for the best migration approac
     }
 }
 /// <summary>
+/// Cleanup rule that removes converted triggers after they've been transformed to style selectors.
+/// This runs with the lowest priority to ensure it executes after all other transformations.
+/// </summary>
+public sealed class ConvertedTriggerCleanupRule : ElementTransformationRuleBase
+{
+    public override string Name => "CleanupConvertedTriggers";
+
+    public override int Priority => 1; // Lowest priority - runs last
+
+    public override bool CanTransformElement(UnifiedXamlElement element)
+    {
+        // Remove any element that was marked as converted to pseudoclass
+        return element.Metadata.ContainsKey("ConvertedToPseudoclass");
+    }
+
+    public override UnifiedXamlElement? TransformElement(UnifiedXamlElement element, TransformationContext context)
+    {
+        context.RecordTransformation(
+            Name,
+            element.TypeName,
+            $"Removed converted {element.TypeName} (already transformed to style selector)");
+
+        // Return null to remove this element from the tree
+        return null;
+    }
+}
+
+/// <summary>
 /// Transforms WPF Styles with ControlTemplates to Avalonia ControlThemes.
 /// WPF uses Style elements with ControlTemplate setters, while Avalonia 11.0+ uses ControlTheme.
 /// </summary>

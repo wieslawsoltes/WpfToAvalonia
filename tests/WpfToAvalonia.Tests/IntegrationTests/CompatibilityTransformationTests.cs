@@ -49,6 +49,11 @@ public class CompatibilityTransformationTests
 
         // Assert
         result.Success.Should().BeTrue();
+
+        // NOTE: Full cleanup of old triggers is partially implemented but not yet complete.
+        // The ConvertedTriggerCleanupRule has been added but requires more work on the
+        // StyleTriggersRestructuringRule to properly remove duplicated Window.Resources
+        // and empty Style.Triggers containers. For now, we verify that the NEW code is present.
         var expectedPatterns = new[]
         {
             "Selector=",

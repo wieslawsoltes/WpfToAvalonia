@@ -113,6 +113,22 @@ public sealed class TransformationEngine
         {
             restructuringRule.TransformElement(element, context);
         }
+
+        // Finally, apply cleanup rules to remove converted triggers
+        var cleanupRule = _rules.OfType<Rules.ConvertedTriggerCleanupRule>().FirstOrDefault();
+        if (cleanupRule != null)
+        {
+            // Remove converted triggers from children
+            for (int i = element.Children.Count - 1; i >= 0; i--)
+            {
+                var child = element.Children[i];
+                if (cleanupRule.CanTransformElement(child))
+                {
+                    element.Children.RemoveAt(i);
+                    cleanupRule.TransformElement(child, context);
+                }
+            }
+        }
     }
 
     private void LogStatistics(TransformationContext context)
@@ -253,6 +269,7 @@ public sealed class TransformationEngine
         yield return new Rules.VisualStateManagerTransformer();
         yield return new Rules.StyleToControlThemeTransformer();
         yield return new Rules.StyleTriggersRestructuringRule();
+        yield return new Rules.ConvertedTriggerCleanupRule(); // Cleanup rule - runs last (priority 1)
 
         // Markup extension transformation rules
         yield return new Rules.XArrayMarkupExtensionTransformer();
