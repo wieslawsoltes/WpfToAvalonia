@@ -51,7 +51,7 @@ public sealed class XamlConverterService
 
         options ??= new ConversionOptions
         {
-            PreserveFormatting = true,
+            PreserveFormatting = false,
             PreserveComments = true,
             AddTransformationComments = false
         };

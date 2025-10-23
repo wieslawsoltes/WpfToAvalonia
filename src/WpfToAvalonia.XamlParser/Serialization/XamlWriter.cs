@@ -57,7 +57,7 @@ public sealed class XamlWriter
         {
             _output.Append(element.Formatting.LeadingWhitespace);
         }
-        else
+        else if (!_options.PreserveFormatting)
         {
             WriteIndent();
         }
@@ -84,7 +84,10 @@ public sealed class XamlWriter
         {
             // Self-closing tag
             _output.Append(" />");
-            _output.Append(_options.NewLine);
+            if (!_options.PreserveFormatting)
+            {
+                _output.Append(_options.NewLine);
+            }
         }
         else
         {
@@ -100,7 +103,7 @@ public sealed class XamlWriter
                 }
                 _output.Append(element.TextContent);
             }
-            else if (hasContent)
+            else if (hasContent && !_options.PreserveFormatting)
             {
                 _output.Append(_options.NewLine);
             }
@@ -120,14 +123,17 @@ public sealed class XamlWriter
             _indentLevel--;
 
             // Write closing tag
-            if (hasContent && element.Children.Count > 0)
+            if (hasContent && element.Children.Count > 0 && !_options.PreserveFormatting)
             {
                 WriteIndent();
             }
             _output.Append("</");
             WriteElementName(element);
             _output.Append('>');
-            _output.Append(_options.NewLine);
+            if (!_options.PreserveFormatting)
+            {
+                _output.Append(_options.NewLine);
+            }
         }
 
         // Write trailing whitespace if preserving formatting
@@ -266,13 +272,19 @@ public sealed class XamlWriter
     /// </summary>
     private void WritePropertyElement(UnifiedXamlProperty property, UnifiedXamlElement parentElement)
     {
-        WriteIndent();
+        if (!_options.PreserveFormatting)
+        {
+            WriteIndent();
+        }
         _output.Append('<');
         _output.Append(parentElement.TypeName);
         _output.Append('.');
         _output.Append(property.PropertyName);
         _output.Append('>');
-        _output.Append(_options.NewLine);
+        if (!_options.PreserveFormatting)
+        {
+            _output.Append(_options.NewLine);
+        }
 
         // Write property value
         _indentLevel++;
@@ -282,25 +294,43 @@ public sealed class XamlWriter
         }
         else if (property.MarkupExtension != null)
         {
-            WriteIndent();
+            if (!_options.PreserveFormatting)
+            {
+                WriteIndent();
+            }
             WriteMarkupExtension(property.MarkupExtension);
-            _output.Append(_options.NewLine);
+            if (!_options.PreserveFormatting)
+            {
+                _output.Append(_options.NewLine);
+            }
         }
         else if (property.Value != null)
         {
-            WriteIndent();
+            if (!_options.PreserveFormatting)
+            {
+                WriteIndent();
+            }
             _output.Append(property.Value.ToString());
-            _output.Append(_options.NewLine);
+            if (!_options.PreserveFormatting)
+            {
+                _output.Append(_options.NewLine);
+            }
         }
         _indentLevel--;
 
-        WriteIndent();
+        if (!_options.PreserveFormatting)
+        {
+            WriteIndent();
+        }
         _output.Append("</");
         _output.Append(parentElement.TypeName);
         _output.Append('.');
         _output.Append(property.PropertyName);
         _output.Append('>');
-        _output.Append(_options.NewLine);
+        if (!_options.PreserveFormatting)
+        {
+            _output.Append(_options.NewLine);
+        }
     }
 
     /// <summary>

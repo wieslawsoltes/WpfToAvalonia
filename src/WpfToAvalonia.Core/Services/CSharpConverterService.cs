@@ -77,8 +77,8 @@ public sealed class CSharpConverterService
             semanticModel = compilation.GetSemanticModel(tree);
 
             // Step 4: Transform dependency properties
-            var dpRewriter = new DependencyPropertyRewriter(semanticModel, diagnostics, _mappingRepository);
-            root = dpRewriter.Visit(root);
+            var dpTransformer = new DependencyPropertyTransformer(diagnostics, semanticModel);
+            root = dpTransformer.Visit(root);
 
             return root.ToFullString();
         }

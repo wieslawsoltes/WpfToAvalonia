@@ -33,7 +33,17 @@ public sealed class TypeReferenceRewriter : WpfToAvaloniaRewriter
     /// </summary>
     public override SyntaxNode? VisitIdentifierName(IdentifierNameSyntax node)
     {
-        var symbolInfo = SemanticModel.GetSymbolInfo(node);
+        SymbolInfo symbolInfo;
+        try
+        {
+            symbolInfo = SemanticModel.GetSymbolInfo(node);
+        }
+        catch
+        {
+            // Node might not exist in semantic model after previous transformations
+            return base.VisitIdentifierName(node);
+        }
+
         var typeSymbol = symbolInfo.Symbol as ITypeSymbol;
 
         if (typeSymbol == null)
@@ -100,7 +110,17 @@ public sealed class TypeReferenceRewriter : WpfToAvaloniaRewriter
     /// </summary>
     public override SyntaxNode? VisitQualifiedName(QualifiedNameSyntax node)
     {
-        var symbolInfo = SemanticModel.GetSymbolInfo(node);
+        SymbolInfo symbolInfo;
+        try
+        {
+            symbolInfo = SemanticModel.GetSymbolInfo(node);
+        }
+        catch
+        {
+            // Node might not exist in semantic model after previous transformations
+            return base.VisitQualifiedName(node);
+        }
+
         var typeSymbol = symbolInfo.Symbol as ITypeSymbol;
 
         if (typeSymbol == null)

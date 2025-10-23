@@ -33,7 +33,17 @@ public sealed class PropertyAccessRewriter : WpfToAvaloniaRewriter
     /// </summary>
     public override SyntaxNode? VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
     {
-        var symbolInfo = SemanticModel.GetSymbolInfo(node);
+        SymbolInfo symbolInfo;
+        try
+        {
+            symbolInfo = SemanticModel.GetSymbolInfo(node);
+        }
+        catch
+        {
+            // Node might not exist in semantic model after previous transformations
+            return base.VisitMemberAccessExpression(node);
+        }
+
         var propertySymbol = symbolInfo.Symbol as IPropertySymbol;
 
         if (propertySymbol == null)
