@@ -1,0 +1,485 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-10-23T00:00:00Z",
+  "namespaceMappings": [
+    {
+      "wpfNamespace": "System.Windows",
+      "avaloniaNamespace": "Avalonia",
+      "notes": "Core WPF to Avalonia namespace mapping"
+    },
+    {
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "notes": "Control library namespace"
+    },
+    {
+      "wpfNamespace": "System.Windows.Controls.Primitives",
+      "avaloniaNamespace": "Avalonia.Controls.Primitives",
+      "notes": "Primitive controls namespace"
+    },
+    {
+      "wpfNamespace": "System.Windows.Data",
+      "avaloniaNamespace": "Avalonia.Data",
+      "notes": "Data binding namespace"
+    },
+    {
+      "wpfNamespace": "System.Windows.Input",
+      "avaloniaNamespace": "Avalonia.Input",
+      "notes": "Input handling namespace"
+    },
+    {
+      "wpfNamespace": "System.Windows.Media",
+      "avaloniaNamespace": "Avalonia.Media",
+      "notes": "Graphics and media namespace"
+    },
+    {
+      "wpfNamespace": "System.Windows.Media.Imaging",
+      "avaloniaNamespace": "Avalonia.Media.Imaging",
+      "notes": "Image handling namespace"
+    },
+    {
+      "wpfNamespace": "System.Windows.Shapes",
+      "avaloniaNamespace": "Avalonia.Controls.Shapes",
+      "notes": "Shape controls namespace"
+    },
+    {
+      "wpfNamespace": "System.Windows.Documents",
+      "avaloniaNamespace": "Avalonia.Controls.Documents",
+      "notes": "Document namespace"
+    },
+    {
+      "wpfNamespace": "System.Windows.Markup",
+      "avaloniaNamespace": "Avalonia.Markup.Xaml",
+      "notes": "XAML markup namespace"
+    },
+    {
+      "wpfNamespace": "System.Windows.Threading",
+      "avaloniaNamespace": "Avalonia.Threading",
+      "notes": "Threading and dispatcher namespace"
+    }
+  ],
+  "typeMappings": [
+    {
+      "wpfTypeName": "System.Windows.Window",
+      "avaloniaTypeName": "Avalonia.Controls.Window",
+      "wpfNamespace": "System.Windows",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "Window",
+      "typeNameChanged": false,
+      "category": "Window"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.UserControl",
+      "avaloniaTypeName": "Avalonia.Controls.UserControl",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "UserControl",
+      "typeNameChanged": false,
+      "category": "Control"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.Button",
+      "avaloniaTypeName": "Avalonia.Controls.Button",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "Button",
+      "typeNameChanged": false,
+      "category": "Control"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.TextBox",
+      "avaloniaTypeName": "Avalonia.Controls.TextBox",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "TextBox",
+      "typeNameChanged": false,
+      "category": "Control"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.TextBlock",
+      "avaloniaTypeName": "Avalonia.Controls.TextBlock",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "TextBlock",
+      "typeNameChanged": false,
+      "category": "Control"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.Label",
+      "avaloniaTypeName": "Avalonia.Controls.TextBlock",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "Label",
+      "typeNameChanged": true,
+      "notes": "Label is replaced with TextBlock in Avalonia",
+      "requiresManualReview": true,
+      "category": "Control"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.ListBox",
+      "avaloniaTypeName": "Avalonia.Controls.ListBox",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "ListBox",
+      "typeNameChanged": false,
+      "category": "Control"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.ComboBox",
+      "avaloniaTypeName": "Avalonia.Controls.ComboBox",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "ComboBox",
+      "typeNameChanged": false,
+      "category": "Control"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.CheckBox",
+      "avaloniaTypeName": "Avalonia.Controls.CheckBox",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "CheckBox",
+      "typeNameChanged": false,
+      "category": "Control"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.RadioButton",
+      "avaloniaTypeName": "Avalonia.Controls.RadioButton",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "RadioButton",
+      "typeNameChanged": false,
+      "category": "Control"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.Grid",
+      "avaloniaTypeName": "Avalonia.Controls.Grid",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "Grid",
+      "typeNameChanged": false,
+      "category": "Panel"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.StackPanel",
+      "avaloniaTypeName": "Avalonia.Controls.StackPanel",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "StackPanel",
+      "typeNameChanged": false,
+      "category": "Panel"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.DockPanel",
+      "avaloniaTypeName": "Avalonia.Controls.DockPanel",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "DockPanel",
+      "typeNameChanged": false,
+      "category": "Panel"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.WrapPanel",
+      "avaloniaTypeName": "Avalonia.Controls.WrapPanel",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "WrapPanel",
+      "typeNameChanged": false,
+      "category": "Panel"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.Canvas",
+      "avaloniaTypeName": "Avalonia.Controls.Canvas",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "Canvas",
+      "typeNameChanged": false,
+      "category": "Panel"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.Border",
+      "avaloniaTypeName": "Avalonia.Controls.Border",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "Border",
+      "typeNameChanged": false,
+      "category": "Decorator"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.ScrollViewer",
+      "avaloniaTypeName": "Avalonia.Controls.ScrollViewer",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "ScrollViewer",
+      "typeNameChanged": false,
+      "category": "Control"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.Image",
+      "avaloniaTypeName": "Avalonia.Controls.Image",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "Image",
+      "typeNameChanged": false,
+      "category": "Control"
+    },
+    {
+      "wpfTypeName": "System.Windows.Controls.DataGrid",
+      "avaloniaTypeName": "Avalonia.Controls.DataGrid",
+      "wpfNamespace": "System.Windows.Controls",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "DataGrid",
+      "typeNameChanged": false,
+      "category": "Control"
+    },
+    {
+      "wpfTypeName": "System.Windows.DependencyObject",
+      "avaloniaTypeName": "Avalonia.AvaloniaObject",
+      "wpfNamespace": "System.Windows",
+      "avaloniaNamespace": "Avalonia",
+      "simpleTypeName": "DependencyObject",
+      "typeNameChanged": true,
+      "notes": "DependencyObject maps to AvaloniaObject",
+      "category": "Core"
+    },
+    {
+      "wpfTypeName": "System.Windows.DependencyProperty",
+      "avaloniaTypeName": "Avalonia.StyledProperty",
+      "wpfNamespace": "System.Windows",
+      "avaloniaNamespace": "Avalonia",
+      "simpleTypeName": "DependencyProperty",
+      "typeNameChanged": true,
+      "notes": "DependencyProperty maps to StyledProperty (or DirectProperty for CLR properties)",
+      "requiresManualReview": true,
+      "category": "Core"
+    },
+    {
+      "wpfTypeName": "System.Windows.FrameworkElement",
+      "avaloniaTypeName": "Avalonia.Controls.Control",
+      "wpfNamespace": "System.Windows",
+      "avaloniaNamespace": "Avalonia.Controls",
+      "simpleTypeName": "FrameworkElement",
+      "typeNameChanged": true,
+      "notes": "FrameworkElement typically maps to Control",
+      "category": "Core"
+    },
+    {
+      "wpfTypeName": "System.Windows.UIElement",
+      "avaloniaTypeName": "Avalonia.Visual",
+      "wpfNamespace": "System.Windows",
+      "avaloniaNamespace": "Avalonia",
+      "simpleTypeName": "UIElement",
+      "typeNameChanged": true,
+      "notes": "UIElement maps to Visual or Control depending on usage",
+      "requiresManualReview": true,
+      "category": "Core"
+    }
+  ],
+  "propertyMappings": [
+    {
+      "wpfPropertyName": "Visibility",
+      "avaloniaPropertyName": "IsVisible",
+      "wpfPropertyType": "System.Windows.Visibility",
+      "avaloniaPropertyType": "bool",
+      "typeChanged": true,
+      "valueConversionRule": "Visibility.Visible -> true, Visibility.Collapsed/Hidden -> false",
+      "notes": "Visibility enum in WPF becomes boolean IsVisible in Avalonia"
+    },
+    {
+      "wpfPropertyName": "Width",
+      "avaloniaPropertyName": "Width",
+      "wpfPropertyType": "double",
+      "avaloniaPropertyType": "double",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "Height",
+      "avaloniaPropertyName": "Height",
+      "wpfPropertyType": "double",
+      "avaloniaPropertyType": "double",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "MinWidth",
+      "avaloniaPropertyName": "MinWidth",
+      "wpfPropertyType": "double",
+      "avaloniaPropertyType": "double",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "MinHeight",
+      "avaloniaPropertyName": "MinHeight",
+      "wpfPropertyType": "double",
+      "avaloniaPropertyType": "double",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "MaxWidth",
+      "avaloniaPropertyName": "MaxWidth",
+      "wpfPropertyType": "double",
+      "avaloniaPropertyType": "double",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "MaxHeight",
+      "avaloniaPropertyName": "MaxHeight",
+      "wpfPropertyType": "double",
+      "avaloniaPropertyType": "double",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "Margin",
+      "avaloniaPropertyName": "Margin",
+      "wpfPropertyType": "System.Windows.Thickness",
+      "avaloniaPropertyType": "Avalonia.Thickness",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "Padding",
+      "avaloniaPropertyName": "Padding",
+      "wpfPropertyType": "System.Windows.Thickness",
+      "avaloniaPropertyType": "Avalonia.Thickness",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "HorizontalAlignment",
+      "avaloniaPropertyName": "HorizontalAlignment",
+      "wpfPropertyType": "System.Windows.HorizontalAlignment",
+      "avaloniaPropertyType": "Avalonia.Layout.HorizontalAlignment",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "VerticalAlignment",
+      "avaloniaPropertyName": "VerticalAlignment",
+      "wpfPropertyType": "System.Windows.VerticalAlignment",
+      "avaloniaPropertyType": "Avalonia.Layout.VerticalAlignment",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "Background",
+      "avaloniaPropertyName": "Background",
+      "wpfPropertyType": "System.Windows.Media.Brush",
+      "avaloniaPropertyType": "Avalonia.Media.IBrush",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "Foreground",
+      "avaloniaPropertyName": "Foreground",
+      "wpfPropertyType": "System.Windows.Media.Brush",
+      "avaloniaPropertyType": "Avalonia.Media.IBrush",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "FontSize",
+      "avaloniaPropertyName": "FontSize",
+      "wpfPropertyType": "double",
+      "avaloniaPropertyType": "double",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "FontFamily",
+      "avaloniaPropertyName": "FontFamily",
+      "wpfPropertyType": "System.Windows.Media.FontFamily",
+      "avaloniaPropertyType": "Avalonia.Media.FontFamily",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "FontWeight",
+      "avaloniaPropertyName": "FontWeight",
+      "wpfPropertyType": "System.Windows.FontWeight",
+      "avaloniaPropertyType": "Avalonia.Media.FontWeight",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "Content",
+      "avaloniaPropertyName": "Content",
+      "wpfPropertyType": "object",
+      "avaloniaPropertyType": "object",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "IsEnabled",
+      "avaloniaPropertyName": "IsEnabled",
+      "wpfPropertyType": "bool",
+      "avaloniaPropertyType": "bool",
+      "typeChanged": false
+    },
+    {
+      "wpfPropertyName": "Name",
+      "avaloniaPropertyName": "Name",
+      "wpfPropertyType": "string",
+      "avaloniaPropertyType": "string",
+      "typeChanged": false
+    }
+  ],
+  "eventMappings": [
+    {
+      "wpfEventName": "Loaded",
+      "avaloniaEventName": "Loaded",
+      "isRoutedEvent": true,
+      "notes": "Loaded event is similar in both frameworks"
+    },
+    {
+      "wpfEventName": "Unloaded",
+      "avaloniaEventName": "Unloaded",
+      "isRoutedEvent": true,
+      "notes": "Unloaded event is similar in both frameworks"
+    },
+    {
+      "wpfEventName": "Click",
+      "avaloniaEventName": "Click",
+      "ownerTypeName": "Button",
+      "isRoutedEvent": true
+    },
+    {
+      "wpfEventName": "MouseEnter",
+      "avaloniaEventName": "PointerEntered",
+      "isRoutedEvent": true,
+      "notes": "Mouse events map to Pointer events in Avalonia"
+    },
+    {
+      "wpfEventName": "MouseLeave",
+      "avaloniaEventName": "PointerExited",
+      "isRoutedEvent": true,
+      "notes": "Mouse events map to Pointer events in Avalonia"
+    },
+    {
+      "wpfEventName": "MouseMove",
+      "avaloniaEventName": "PointerMoved",
+      "isRoutedEvent": true,
+      "notes": "Mouse events map to Pointer events in Avalonia"
+    },
+    {
+      "wpfEventName": "MouseDown",
+      "avaloniaEventName": "PointerPressed",
+      "isRoutedEvent": true,
+      "notes": "Mouse events map to Pointer events in Avalonia"
+    },
+    {
+      "wpfEventName": "MouseUp",
+      "avaloniaEventName": "PointerReleased",
+      "isRoutedEvent": true,
+      "notes": "Mouse events map to Pointer events in Avalonia"
+    },
+    {
+      "wpfEventName": "KeyDown",
+      "avaloniaEventName": "KeyDown",
+      "isRoutedEvent": true
+    },
+    {
+      "wpfEventName": "KeyUp",
+      "avaloniaEventName": "KeyUp",
+      "isRoutedEvent": true
+    },
+    {
+      "wpfEventName": "GotFocus",
+      "avaloniaEventName": "GotFocus",
+      "isRoutedEvent": true
+    },
+    {
+      "wpfEventName": "LostFocus",
+      "avaloniaEventName": "LostFocus",
+      "isRoutedEvent": true
+    }
+  ]
+}

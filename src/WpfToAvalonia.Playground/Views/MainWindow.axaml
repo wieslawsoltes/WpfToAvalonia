@@ -1,0 +1,142 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:WpfToAvalonia.Playground.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:avaloniaEdit="using:AvaloniaEdit"
+        mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="900"
+        x:Class="WpfToAvalonia.Playground.Views.MainWindow"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="WPF to Avalonia Playground"
+        Width="1400" Height="900">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Toolbar -->
+        <Border Grid.Row="0" Background="#2D2D30" Padding="8">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Content="Open File" Command="{Binding OpenFileCommand}"
+                        Background="#0E639C" Foreground="White" Padding="10,5" />
+                <Button Content="Convert" Command="{Binding ConvertCommand}"
+                        Background="#0E639C" Foreground="White" Padding="10,5" FontWeight="Bold" />
+                <Button Content="Save Output" Command="{Binding SaveOutputCommand}"
+                        Background="#0E639C" Foreground="White" Padding="10,5" />
+                <Separator Width="1" Height="24" Background="#3F3F46" />
+                <ComboBox ItemsSource="{Binding ConversionModes}"
+                          SelectedItem="{Binding SelectedMode}"
+                          Width="120" Background="#3C3C3C" Foreground="White" />
+                <CheckBox Content="Auto Convert" IsChecked="{Binding AutoConvert}"
+                          Foreground="White" />
+                <CheckBox Content="Preserve Formatting" IsChecked="{Binding PreserveFormatting}"
+                          Foreground="White" />
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,5,*,5,250">
+            <!-- WPF Input -->
+            <Grid Grid.Column="0" RowDefinitions="Auto,*">
+                <Border Background="#2D2D30" Padding="8">
+                    <TextBlock Text="WPF Input (XAML/C#)" Foreground="#FFFFFF" FontWeight="Bold" FontSize="13" />
+                </Border>
+                <Border Grid.Row="1" BorderBrush="#3F3F46" BorderThickness="1" Background="#1E1E1E">
+                    <avaloniaEdit:TextEditor Name="InputEditor"
+                                           Document="{Binding InputDocument}"
+                                           FontFamily="Cascadia Code,Consolas,Courier New"
+                                           FontSize="13"
+                                           ShowLineNumbers="True" />
+                </Border>
+            </Grid>
+
+            <!-- Splitter -->
+            <GridSplitter Grid.Column="1" Width="5" Background="#3F3F46" />
+
+            <!-- Avalonia Output -->
+            <Grid Grid.Column="2" RowDefinitions="Auto,*">
+                <Border Background="#2D2D30" Padding="8">
+                    <TextBlock Text="Avalonia Output" Foreground="#FFFFFF" FontWeight="Bold" FontSize="13" />
+                </Border>
+                <Border Grid.Row="1" BorderBrush="#3F3F46" BorderThickness="1" Background="#1E1E1E">
+                    <avaloniaEdit:TextEditor Name="OutputEditor"
+                                           Document="{Binding OutputDocument}"
+                                           FontFamily="Cascadia Code,Consolas,Courier New"
+                                           FontSize="13"
+                                           ShowLineNumbers="True"
+                                           IsReadOnly="True" />
+                </Border>
+            </Grid>
+
+            <!-- Splitter -->
+            <GridSplitter Grid.Column="3" Width="5" Background="#3F3F46" />
+
+            <!-- Diagnostics Panel -->
+            <Grid Grid.Column="4" RowDefinitions="Auto,*,Auto,2*">
+                <!-- Transformation Statistics -->
+                <Border Background="#2D2D30" Padding="8">
+                    <TextBlock Text="Statistics" Foreground="#FFFFFF" FontWeight="Bold" FontSize="13" />
+                </Border>
+                <Border Grid.Row="1" BorderBrush="#3F3F46" BorderThickness="1" Padding="8" Background="#252526">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="{Binding TotalTransformations, StringFormat='Total: {0}'}"
+                                   Foreground="#FFFFFF" FontSize="12" FontWeight="Medium" />
+                        <TextBlock Text="{Binding ErrorCount, StringFormat='Errors: {0}'}"
+                                   Foreground="#F48771" FontSize="12" FontWeight="Medium" />
+                        <TextBlock Text="{Binding WarningCount, StringFormat='Warnings: {0}'}"
+                                   Foreground="#FFC66D" FontSize="12" FontWeight="Medium" />
+                        <TextBlock Text="{Binding InfoCount, StringFormat='Info: {0}'}"
+                                   Foreground="#75BEFF" FontSize="12" FontWeight="Medium" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Diagnostics List -->
+                <Border Grid.Row="2" Background="#2D2D30" Padding="8">
+                    <TextBlock Text="Diagnostics" Foreground="#FFFFFF" FontWeight="Bold" FontSize="13" />
+                </Border>
+                <Border Grid.Row="3" BorderBrush="#3F3F46" BorderThickness="1" Background="#1E1E1E">
+                    <ListBox ItemsSource="{Binding Diagnostics}"
+                             Background="#1E1E1E"
+                             BorderThickness="0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="vm:DiagnosticItemViewModel">
+                                <Border BorderBrush="#3F3F46" BorderThickness="0,0,0,1" Padding="8,6">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Text="{Binding Code}"
+                                                   Foreground="#569CD6"
+                                                   FontWeight="Bold"
+                                                   FontSize="11" />
+                                        <TextBlock Text="{Binding Message}"
+                                                   Foreground="#E0E0E0"
+                                                   TextWrapping="Wrap"
+                                                   FontSize="11" />
+                                        <TextBlock Text="{Binding Location}"
+                                                   Foreground="#9D9D9D"
+                                                   FontSize="10" />
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="2" Background="#0E639C" Padding="8,6">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="{Binding StatusText}"
+                           Foreground="#FFFFFF"
+                           FontSize="12"
+                           VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1"
+                           Text="{Binding ConversionTime, StringFormat='Conversion Time: {0:F2}ms'}"
+                           Foreground="#FFFFFF"
+                           FontSize="12"
+                           VerticalAlignment="Center"
+                           Margin="16,0,0,0" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

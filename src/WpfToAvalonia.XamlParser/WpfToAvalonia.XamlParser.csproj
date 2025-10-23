@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\WpfToAvalonia.Core\WpfToAvalonia.Core.csproj" />
+    <ProjectReference Include="..\WpfToAvalonia.Mappings\WpfToAvalonia.Mappings.csproj" />
+    <!-- XamlX integration will be added later via wrapper -->
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,86 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:avaloniaEdit="using:AvaloniaEdit"
+             x:Class="WpfToAvalonia.Playground.App"
+             xmlns:local="using:WpfToAvalonia.Playground"
+             RequestedThemeVariant="Dark">
+             <!-- Dark theme for better code editor visibility -->
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+
+    <Application.Styles>
+        <FluentTheme />
+
+        <!-- AvaloniaEdit Fluent Theme -->
+        <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+
+        <!-- Custom styles for better visibility -->
+        <Style Selector="Button">
+            <Setter Property="CornerRadius" Value="3" />
+        </Style>
+
+        <Style Selector="Button:pointerover">
+            <Setter Property="Background" Value="#1177BB" />
+        </Style>
+
+        <Style Selector="Button:pressed">
+            <Setter Property="Background" Value="#0D5A8F" />
+        </Style>
+
+        <Style Selector="ListBoxItem:selected">
+            <Setter Property="Background" Value="#094771" />
+        </Style>
+
+        <Style Selector="ListBoxItem:selected:pointerover">
+            <Setter Property="Background" Value="#0E639C" />
+        </Style>
+
+        <!-- AvaloniaEdit Theme Styles -->
+        <Style Selector="avaloniaEdit|TextEditor">
+            <Setter Property="Background" Value="#1E1E1E" />
+            <Setter Property="Foreground" Value="#D4D4D4" />
+            <Setter Property="LineNumbersForeground" Value="#858585" />
+            <Setter Property="BorderBrush" Value="#3F3F46" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="4" />
+        </Style>
+
+        <!-- Current line highlight -->
+        <Style Selector="avaloniaEdit|TextEditor /template/ Border#PART_LineNumberBorder">
+            <Setter Property="Background" Value="#1E1E1E" />
+            <Setter Property="BorderBrush" Value="#3F3F46" />
+            <Setter Property="BorderThickness" Value="0,0,1,0" />
+        </Style>
+
+        <!-- ScrollViewer in TextEditor -->
+        <Style Selector="avaloniaEdit|TextEditor ScrollViewer">
+            <Setter Property="Background" Value="#1E1E1E" />
+        </Style>
+
+        <Style Selector="avaloniaEdit|TextEditor ScrollBar">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+
+        <Style Selector="avaloniaEdit|TextEditor ScrollBar:vertical">
+            <Setter Property="Background" Value="#1E1E1E" />
+        </Style>
+
+        <Style Selector="avaloniaEdit|TextEditor ScrollBar:horizontal">
+            <Setter Property="Background" Value="#1E1E1E" />
+        </Style>
+
+        <Style Selector="avaloniaEdit|TextEditor ScrollBar Thumb">
+            <Setter Property="Background" Value="#424242" />
+        </Style>
+
+        <Style Selector="avaloniaEdit|TextEditor ScrollBar Thumb:pointerover">
+            <Setter Property="Background" Value="#4E4E4E" />
+        </Style>
+
+        <Style Selector="avaloniaEdit|TextEditor ScrollBar Thumb:pressed">
+            <Setter Property="Background" Value="#5A5A5A" />
+        </Style>
+    </Application.Styles>
+</Application>
