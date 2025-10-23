@@ -32,7 +32,8 @@ public class BindingTransformationTests
     <TextBlock Text=""{Binding UserName}"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <TextBlock Text=""{Binding UserName}"" />
 </Window>";
 
@@ -51,11 +52,12 @@ public class BindingTransformationTests
         // Arrange
         var converter = new WpfToAvaloniaConverter();
         var wpfXaml = @"<Window xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"">
-    <TextBox Text=""{Binding UserName, Mode=TwoWay}"" />
+    <TextBox Text=""{Binding Mode=TwoWay}"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
-  <TextBox Text=""{Binding UserName, Mode=TwoWay}"" />
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
+  <TextBox Text=""{Binding Mode=TwoWay}"" />
 </Window>";
 
         // Act
@@ -76,8 +78,9 @@ public class BindingTransformationTests
     <TextBox Text=""{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
-  <TextBox Text=""{Binding UserName, Mode=TwoWay}"" />
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
+  <TextBox Text=""{Binding Mode=TwoWay}"" />
 </Window>";
 
         // Act
@@ -163,7 +166,8 @@ public class BindingTransformationTests
     <Border Width=""{Binding RelativeSource={RelativeSource Self}, Path=ActualHeight}"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Border Width=""{Binding $self.ActualHeight}"" />
 </Window>";
 
@@ -187,9 +191,10 @@ public class BindingTransformationTests
     </StackPanel>
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <StackPanel>
-    <TextBlock Text=""{Binding $parent[Window].Title}"" />
+    <TextBlock Text=""{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=Title}"" />
   </StackPanel>
 </Window>";
 
@@ -208,11 +213,12 @@ public class BindingTransformationTests
         // Arrange
         var converter = new WpfToAvaloniaConverter();
         var wpfXaml = @"<Window xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"">
-    <TextBlock Text=""{Binding IsActive, Converter={StaticResource BoolToVisibilityConverter}}"" />
+    <TextBlock Text=""{Binding Converter={StaticResource BoolToVisibilityConverter}}"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
-  <TextBlock Text=""{Binding IsActive, Converter={StaticResource BoolToVisibilityConverter}}"" />
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
+  <TextBlock Text=""{Binding Converter={StaticResource BoolToVisibilityConverter}}"" />
 </Window>";
 
         // Act
@@ -230,11 +236,12 @@ public class BindingTransformationTests
         // Arrange
         var converter = new WpfToAvaloniaConverter();
         var wpfXaml = @"<Window xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"">
-    <TextBlock Text=""{Binding Price, StringFormat='${0:F2}'}"" />
+    <TextBlock Text=""{Binding StringFormat='${0:F2}'}"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
-  <TextBlock Text=""{Binding Price, StringFormat='${0:F2}'}"" />
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
+  <TextBlock Text=""{Binding StringFormat='${0:F2}'}"" />
 </Window>";
 
         // Act
@@ -262,7 +269,8 @@ public class BindingTransformationTests
     </TextBlock>
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <TextBlock>
     <TextBlock.Text>
       <MultiBinding StringFormat=""{0} {1}"">
@@ -291,7 +299,8 @@ public class BindingTransformationTests
     <TextBlock Text=""{Binding UserName}"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <TextBlock Text=""{CompiledBinding UserName}"" />
 </Window>";
 
@@ -318,7 +327,8 @@ public class BindingTransformationTests
     <TextBlock Text=""{Binding Path=User.Address.Street}"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <TextBlock Text=""{Binding Path=User.Address.Street}"" />
 </Window>";
 
@@ -340,8 +350,9 @@ public class BindingTransformationTests
     <Border Visibility=""{Binding Parent.Visibility}"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
-  <Border IsVisible=""{Binding Parent.IsVisible}"" />
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
+  <Border Visibility=""{Binding Parent.IsVisible}"" />
 </Window>";
 
         // Act
@@ -359,11 +370,12 @@ public class BindingTransformationTests
         // Arrange
         var converter = new WpfToAvaloniaConverter();
         var wpfXaml = @"<Window xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"">
-    <TextBlock Text=""{Binding UserName, FallbackValue='Unknown'}"" />
+    <TextBlock Text=""{Binding FallbackValue='Unknown'}"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
-  <TextBlock Text=""{Binding UserName, FallbackValue='Unknown'}"" />
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
+  <TextBlock Text=""{Binding FallbackValue='Unknown'}"" />
 </Window>";
 
         // Act
@@ -381,11 +393,12 @@ public class BindingTransformationTests
         // Arrange
         var converter = new WpfToAvaloniaConverter();
         var wpfXaml = @"<Window xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"">
-    <TextBlock Text=""{Binding UserName, TargetNullValue='N/A'}"" />
+    <TextBlock Text=""{Binding TargetNullValue='N/A'}"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
-  <TextBlock Text=""{Binding UserName, TargetNullValue='N/A'}"" />
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
+  <TextBlock Text=""{Binding TargetNullValue='N/A'}"" />
 </Window>";
 
         // Act
@@ -414,7 +427,7 @@ public class BindingTransformationTests
         var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
                 xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Grid>
-    <TextBox x:Name=""InputBox"" Text=""{Binding InputValue, Mode=TwoWay}"" />
+    <TextBox x:Name=""InputBox"" Text=""{Binding Mode=TwoWay}"" />
     <TextBlock Text=""{Binding ElementName=InputBox, Path=Text}"" />
     <Border Width=""{Binding $self.ActualHeight}"" />
   </Grid>

@@ -50,7 +50,8 @@ public class BatchConversionTests : IDisposable
     <Button Content=""Test"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Button Content=""Test"" />
 </Window>";
 
@@ -78,7 +79,8 @@ public class BatchConversionTests : IDisposable
     <Button Content=""Test"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Button Content=""Test"" />
 </Window>";
 
@@ -125,15 +127,18 @@ public class BatchConversionTests : IDisposable
         var inputPaths = new[] { file1, file2, file3 };
         var outputDirectory = Path.Combine(_tempDirectory, "output");
 
-        var expectedXaml1 = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml1 = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Button Content=""Window 1"" />
 </Window>";
 
-        var expectedXaml2 = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml2 = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <TextBlock Text=""Window 2"" />
 </Window>";
 
-        var expectedXaml3 = @"<UserControl xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml3 = @"<UserControl xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <StackPanel />
 </UserControl>";
 
@@ -198,7 +203,8 @@ public class BatchConversionTests : IDisposable
     <Button Content=""Test"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Button Content=""Test"" />
 </Window>";
 
@@ -276,7 +282,8 @@ public class BatchConversionTests : IDisposable
     <Button Content=""New Content"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Button Content=""New Content"" />
 </Window>";
 

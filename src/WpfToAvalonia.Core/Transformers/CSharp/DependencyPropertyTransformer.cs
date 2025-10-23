@@ -185,9 +185,9 @@ public sealed class DependencyPropertyTransformer : CSharpSyntaxRewriter
         }
 
         var propertyName = ExtractStringLiteral(args[0].Expression);
-        var propertyType = args[1].Expression.ToString();
+        var propertyType = ExtractTypeFromTypeOf(args[1].Expression);
 
-        var ownerType = args.Count > 2 ? args[2].Expression.ToString() : null;
+        var ownerType = args.Count > 2 ? ExtractTypeFromTypeOf(args[2].Expression) : null;
         var metadata = args.Count > 3 ? args[3].Expression : null;
 
         return new DependencyPropertyAnalysis
@@ -373,6 +373,18 @@ public sealed class DependencyPropertyTransformer : CSharpSyntaxRewriter
         }
 
         return expression.ToString().Trim('"');
+    }
+
+    private string ExtractTypeFromTypeOf(ExpressionSyntax expression)
+    {
+        // Extract the type from typeof(T) expression
+        if (expression is TypeOfExpressionSyntax typeOfExpression)
+        {
+            return typeOfExpression.Type.ToString();
+        }
+
+        // If it's not a typeof expression, return as-is
+        return expression.ToString();
     }
 
     private List<string> ExtractConstructorArguments(ExpressionSyntax expression)

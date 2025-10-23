@@ -53,13 +53,17 @@ public sealed class MethodInvocationTransformer : CSharpSyntaxRewriter
 
     public override SyntaxNode? VisitInvocationExpression(InvocationExpressionSyntax node)
     {
-        // Try to transform method invocation
+        // Try to transform method invocation on the original node (before visiting children)
+        // We need to use the original node for semantic analysis
         var transformedNode = TransformMethodInvocation(node);
         if (transformedNode != null && transformedNode != node)
         {
-            return base.VisitInvocationExpression(transformedNode);
+            // Return the transformed node directly without revisiting
+            // The transformed node is already complete and doesn't need semantic analysis
+            return transformedNode;
         }
 
+        // No transformation, visit children normally
         return base.VisitInvocationExpression(node);
     }
 
@@ -126,7 +130,8 @@ public sealed class MethodInvocationTransformer : CSharpSyntaxRewriter
         // WPF: await Dispatcher.InvokeAsync(() => { ... })
         // Avalonia: await Dispatcher.UIThread.InvokeAsync(() => { ... })
 
-        var baseExpression = memberAccess.Expression;
+        // Visit the base expression to handle nested invocations
+        var baseExpression = (ExpressionSyntax)Visit(memberAccess.Expression)!;
         var methodIdentifier = memberAccess.Name;
 
         InvocationExpressionSyntax newInvocation;
@@ -147,14 +152,20 @@ public sealed class MethodInvocationTransformer : CSharpSyntaxRewriter
                 dispatcherUIThread,
                 SyntaxFactory.IdentifierName(newMethodName));
 
-            // For Dispatcher.Invoke and BeginInvoke, we need to handle DispatcherPriority parameter
-            // Avalonia doesn't have DispatcherPriority, so we remove it
+            // Filter arguments FIRST (before visiting), then visit the filtered ones
             var args = node.ArgumentList.Arguments;
             var filteredArgs = FilterDispatcherPriorityArguments(args);
 
+            // Now visit the filtered arguments
+            var visitedArgs = filteredArgs.Select(arg =>
+                SyntaxFactory.Argument(
+                    arg.NameColon,
+                    arg.RefKindKeyword,
+                    (ExpressionSyntax)Visit(arg.Expression)!));
+
             newInvocation = SyntaxFactory.InvocationExpression(
                 newMemberAccess,
-                SyntaxFactory.ArgumentList(filteredArgs));
+                SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(visitedArgs)));
 
             _diagnostics.AddInfo(
                 "DISPATCHER_METHOD_TRANSFORMED",
@@ -211,7 +222,15 @@ public sealed class MethodInvocationTransformer : CSharpSyntaxRewriter
             return node;
         }
 
-        var targetElement = args[0].Expression;
+        // Visit the argument expressions to transform any nested invocations
+        var visitedArgs = SyntaxFactory.ArgumentList(
+            SyntaxFactory.SeparatedList(args.Select(arg =>
+                SyntaxFactory.Argument(
+                    arg.NameColon,
+                    arg.RefKindKeyword,
+                    (ExpressionSyntax)Visit(arg.Expression)!))));
+
+        var targetElement = visitedArgs.Arguments[0].Expression;
 
         if (methodName.Contains("GetParent"))
         {
@@ -233,10 +252,40 @@ public sealed class MethodInvocationTransformer : CSharpSyntaxRewriter
 
             return newInvocation;
         }
+        else if (methodName.Contains("GetChildrenCount"))
+        {
+            // Transform to element.GetVisualChildren().Count()
+            // Check this BEFORE "GetChild" because "GetChildrenCount" contains "GetChild"
+            var getVisualChildren = SyntaxFactory.MemberAccessExpression(
+                SyntaxKind.SimpleMemberAccessExpression,
+                targetElement,
+                SyntaxFactory.IdentifierName("GetVisualChildren"));
+
+            var getVisualChildrenInvocation = SyntaxFactory.InvocationExpression(
+                getVisualChildren,
+                SyntaxFactory.ArgumentList());
+
+            var count = SyntaxFactory.MemberAccessExpression(
+                SyntaxKind.SimpleMemberAccessExpression,
+                getVisualChildrenInvocation,
+                SyntaxFactory.IdentifierName("Count"));
+
+            var newInvocation = SyntaxFactory.InvocationExpression(
+                count,
+                SyntaxFactory.ArgumentList());
+
+            _diagnostics.AddInfo(
+                "VISUAL_TREE_METHOD_TRANSFORMED",
+                "Transformed VisualTreeHelper.GetChildrenCount to GetVisualChildren().Count()",
+                node.GetLocation().GetLineSpan().Path,
+                node.GetLocation().GetLineSpan().StartLinePosition.Line);
+
+            return newInvocation;
+        }
         else if (methodName.Contains("GetChild"))
         {
             // Transform to element.GetVisualChildren().ElementAt(index)
-            if (args.Count < 2)
+            if (visitedArgs.Arguments.Count < 2)
             {
                 _diagnostics.AddWarning(
                     "VISUAL_TREE_INCOMPLETE",
@@ -245,7 +294,7 @@ public sealed class MethodInvocationTransformer : CSharpSyntaxRewriter
                 return node;
             }
 
-            var indexArg = args[1].Expression;
+            var indexArg = visitedArgs.Arguments[1].Expression;
 
             var getVisualChildren = SyntaxFactory.MemberAccessExpression(
                 SyntaxKind.SimpleMemberAccessExpression,
@@ -274,35 +323,6 @@ public sealed class MethodInvocationTransformer : CSharpSyntaxRewriter
 
             return newInvocation;
         }
-        else if (methodName.Contains("GetChildrenCount"))
-        {
-            // Transform to element.GetVisualChildren().Count()
-            var getVisualChildren = SyntaxFactory.MemberAccessExpression(
-                SyntaxKind.SimpleMemberAccessExpression,
-                targetElement,
-                SyntaxFactory.IdentifierName("GetVisualChildren"));
-
-            var getVisualChildrenInvocation = SyntaxFactory.InvocationExpression(
-                getVisualChildren,
-                SyntaxFactory.ArgumentList());
-
-            var count = SyntaxFactory.MemberAccessExpression(
-                SyntaxKind.SimpleMemberAccessExpression,
-                getVisualChildrenInvocation,
-                SyntaxFactory.IdentifierName("Count"));
-
-            var newInvocation = SyntaxFactory.InvocationExpression(
-                count,
-                SyntaxFactory.ArgumentList());
-
-            _diagnostics.AddInfo(
-                "VISUAL_TREE_METHOD_TRANSFORMED",
-                "Transformed VisualTreeHelper.GetChildrenCount to GetVisualChildren().Count()",
-                node.GetLocation().GetLineSpan().Path,
-                node.GetLocation().GetLineSpan().StartLinePosition.Line);
-
-            return newInvocation;
-        }
 
         return node;
     }
@@ -324,7 +344,15 @@ public sealed class MethodInvocationTransformer : CSharpSyntaxRewriter
             return node;
         }
 
-        var targetElement = args[0].Expression;
+        // Visit the argument expressions to transform any nested invocations
+        var visitedArgs = SyntaxFactory.ArgumentList(
+            SyntaxFactory.SeparatedList(args.Select(arg =>
+                SyntaxFactory.Argument(
+                    arg.NameColon,
+                    arg.RefKindKeyword,
+                    (ExpressionSyntax)Visit(arg.Expression)!))));
+
+        var targetElement = visitedArgs.Arguments[0].Expression;
 
         if (methodName.Contains("GetParent"))
         {
@@ -381,11 +409,12 @@ public sealed class MethodInvocationTransformer : CSharpSyntaxRewriter
             var args = node.ArgumentList.Arguments;
             if (args.Count > 0)
             {
-                var targetElement = args[0].Expression;
+                // Visit the argument expression to transform any nested invocations
+                var visitedArg = (ExpressionSyntax)Visit(args[0].Expression)!;
 
                 var newMemberAccess = SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
-                    targetElement,
+                    visitedArg,
                     SyntaxFactory.IdentifierName("Focus"));
 
                 var newInvocation = SyntaxFactory.InvocationExpression(

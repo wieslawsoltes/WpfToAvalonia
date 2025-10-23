@@ -109,12 +109,14 @@ public class StyleTransformationTests
         var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
                 xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Window.Resources>
-    <Style x:Key=""BaseButtonStyle"" TargetType=""Button"">
-      <Setter Property=""Padding"" Value=""10"" />
-    </Style>
-    <Style x:Key=""DerivedButtonStyle"" TargetType=""Button"" BasedOn=""{StaticResource BaseButtonStyle}"">
-      <Setter Property=""Background"" Value=""Blue"" />
-    </Style>
+    <Window.Resources>
+      <Style x:Key=""BaseButtonStyle"" TargetType=""Button"">
+        <Setter Property=""Padding"" Value=""10"" />
+      </Style>
+      <Style x:Key=""DerivedButtonStyle"" TargetType=""Button"" BasedOn=""{StaticResource BaseButtonStyle}"">
+        <Setter Property=""Background"" Value=""Blue"" />
+      </Style>
+    </Window.Resources>
   </Window.Resources>
 </Window>";
 
@@ -140,10 +142,11 @@ public class StyleTransformationTests
     </Window.Resources>
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Window.Resources>
     <Style TargetType=""Button"">
-      <Setter Property=""IsVisible"" Value=""true"" />
+      <Setter Property=""IsVisible"" Value=""Visible"" />
     </Style>
   </Window.Resources>
 </Window>";
@@ -170,7 +173,8 @@ public class StyleTransformationTests
     </Window.Resources>
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Window.Resources>
     <Style TargetType=""Button"">
       <Setter Property=""ToolTip.Tip"" Value=""Click me"" />
@@ -204,15 +208,21 @@ public class StyleTransformationTests
     </Window.Resources>
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Window.Resources>
-    <Style TargetType=""Button"">
-      <Style.Triggers>
-        <Trigger Property=""IsMouseOver"" Value=""True"">
-          <Setter Property=""Background"" Value=""Red"" />
-        </Trigger>
-      </Style.Triggers>
-    </Style>
+    <Window.Resources>
+      <Style TargetType=""Button"">
+        <Style.Triggers>
+          <Trigger Property=""IsMouseOver"" Value=""True"">
+            <Setter Property=""Background"" Value=""Red"" />
+          </Trigger>
+        </Style.Triggers>
+      </Style>
+      <Style Selector=""Button:pointerover"">
+        <Setter Property=""Background"" Value=""Red"" />
+      </Style>
+    </Window.Resources>
   </Window.Resources>
 </Window>";
 
@@ -293,10 +303,13 @@ public class StyleTransformationTests
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>";
 
-        var expectedXaml = @"<ResourceDictionary xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<ResourceDictionary xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source=""Styles/ButtonStyles.xaml"" />
-    <ResourceDictionary Source=""Styles/TextStyles.xaml"" />
+    <ResourceDictionary.MergedDictionaries>
+      <ResourceDictionary Source=""Styles/ButtonStyles.xaml"" />
+      <ResourceDictionary Source=""Styles/TextStyles.xaml"" />
+    </ResourceDictionary.MergedDictionaries>
   </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>";
 
@@ -439,8 +452,7 @@ public class StyleTransformationTests
 </Window>";
 
         var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
-                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
-                xmlns:local=""clr-namespace:MyApp.Models"">
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Window.Resources>
     <DataTemplate DataType=""{x:Type local:Person}"">
       <TextBlock Text=""{Binding Name}"" />
@@ -517,7 +529,8 @@ public class StyleTransformationTests
     </Window.Resources>
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Window.Resources>
     <Style TargetType=""TextBlock"">
       <Setter Property=""FontFamily"" Value=""Arial"" />

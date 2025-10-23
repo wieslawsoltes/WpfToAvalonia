@@ -34,7 +34,8 @@ public class TransformationRulesTests
     </ListView>
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <ListBox>
     <ListBoxItem Content=""Item 1"" />
   </ListBox>
@@ -58,7 +59,8 @@ public class TransformationRulesTests
     <DataGrid AutoGenerateColumns=""True"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <DataGrid AutoGenerateColumns=""True"" />
 </Window>";
 
@@ -80,7 +82,8 @@ public class TransformationRulesTests
     <Button Visibility=""Visible"" Content=""Test"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Button IsVisible=""true"" Content=""Test"" />
 </Window>";
 
@@ -102,7 +105,8 @@ public class TransformationRulesTests
     <Button Visibility=""Hidden"" Content=""Test"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Button IsVisible=""false"" Content=""Test"" />
 </Window>";
 
@@ -124,7 +128,8 @@ public class TransformationRulesTests
     <Button Cursor=""Hand"" Content=""Test"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Button Cursor=""Hand"" Content=""Test"" />
 </Window>";
 
@@ -146,7 +151,8 @@ public class TransformationRulesTests
     <Button Cursor=""SizeNS"" Content=""Test"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Button Cursor=""SizeNorthSouth"" Content=""Test"" />
 </Window>";
 
@@ -168,7 +174,8 @@ public class TransformationRulesTests
     <Button ToolTip=""This is a tooltip"" Content=""Test"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Button ToolTip.Tip=""This is a tooltip"" Content=""Test"" />
 </Window>";
 
@@ -194,7 +201,8 @@ public class TransformationRulesTests
             Content=""Test"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Button IsVisible=""true""
           ToolTip.Tip=""Tooltip text""
           Margin=""10""
@@ -224,7 +232,8 @@ public class TransformationRulesTests
                Text=""Test"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <TextBlock FontFamily=""Arial""
              FontSize=""14""
              FontWeight=""Bold""
@@ -250,7 +259,8 @@ public class TransformationRulesTests
     <Button Foreground=""Red"" Background=""Blue"" BorderBrush=""Green"" Content=""Test"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Button Foreground=""Red"" Background=""Blue"" BorderBrush=""Green"" Content=""Test"" />
 </Window>";
 
@@ -278,7 +288,8 @@ public class TransformationRulesTests
             Content=""Test"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Button Width=""100""
           Height=""50""
           MinWidth=""80""
@@ -306,7 +317,8 @@ public class TransformationRulesTests
     <Button HorizontalAlignment=""Left"" VerticalAlignment=""Top"" Content=""Test"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Button HorizontalAlignment=""Left"" VerticalAlignment=""Top"" Content=""Test"" />
 </Window>";
 
@@ -328,7 +340,8 @@ public class TransformationRulesTests
     <Button Opacity=""0.5"" RenderTransformOrigin=""0.5,0.5"" Content=""Test"" />
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Button Opacity=""0.5"" RenderTransformOrigin=""0.5,0.5"" Content=""Test"" />
 </Window>";
 
@@ -353,7 +366,8 @@ public class TransformationRulesTests
     </UniformGrid>
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <UniformGrid Rows=""2"" Columns=""3"">
     <Button Content=""1"" />
     <Button Content=""2"" />
@@ -381,7 +395,8 @@ public class TransformationRulesTests
     </WrapPanel>
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <WrapPanel Orientation=""Vertical"">
     <Button Content=""1"" />
     <Button Content=""2"" />
@@ -409,7 +424,8 @@ public class TransformationRulesTests
     </DockPanel>
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <DockPanel LastChildFill=""True"">
     <Button DockPanel.Dock=""Top"" Content=""Top"" />
     <Button Content=""Fill"" />
@@ -438,7 +454,8 @@ public class TransformationRulesTests
     </ScrollViewer>
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <ScrollViewer VerticalScrollBarVisibility=""Auto"">
     <StackPanel>
       <Button Content=""1"" />
@@ -471,7 +488,8 @@ public class TransformationRulesTests
     </TabControl>
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <TabControl>
     <TabItem Header=""Tab 1"">
       <TextBlock Text=""Content 1"" />
@@ -505,7 +523,8 @@ public class TransformationRulesTests
     </Menu>
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Menu>
     <MenuItem Header=""File"">
       <MenuItem Header=""New"" />
@@ -534,7 +553,8 @@ public class TransformationRulesTests
     </Expander>
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <Expander Header=""Click to expand"">
     <TextBlock Text=""Hidden content"" />
   </Expander>
@@ -562,7 +582,8 @@ public class TransformationRulesTests
     </GroupBox>
 </Window>";
 
-        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui"">
+        var expectedXaml = @"<Window xmlns=""https://github.com/avaloniaui""
+                xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
   <GroupBox Header=""Group Title"">
     <StackPanel>
       <Button Content=""Button"" />

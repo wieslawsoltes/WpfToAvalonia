@@ -21,7 +21,23 @@ public sealed class ProjectFileParser
         {
             if (!_msbuildLocatorRegistered)
             {
-                MSBuildLocator.RegisterDefaults();
+                // Only register if not already registered
+                if (!MSBuildLocator.IsRegistered)
+                {
+                    // Try to find the best MSBuild instance
+                    var instances = MSBuildLocator.QueryVisualStudioInstances().ToList();
+                    if (instances.Any())
+                    {
+                        // Register the newest version available
+                        var newest = instances.OrderByDescending(i => i.Version).First();
+                        MSBuildLocator.RegisterInstance(newest);
+                    }
+                    else
+                    {
+                        // Fallback to RegisterDefaults
+                        MSBuildLocator.RegisterDefaults();
+                    }
+                }
                 _msbuildLocatorRegistered = true;
             }
         }
