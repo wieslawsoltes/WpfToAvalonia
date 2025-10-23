@@ -12,6 +12,40 @@ namespace WpfToAvalonia.Tests.UnitTests;
 /// </summary>
 public class DependencyPropertyTransformationTests
 {
+    /// <summary>
+    /// Normalizes C# code by removing extra whitespace and formatting for comparison.
+    /// </summary>
+    private static string NormalizeCode(string code)
+    {
+        // Remove all newlines and extra whitespace
+        var normalized = System.Text.RegularExpressions.Regex.Replace(
+            code.Trim(),
+            @"\s+",
+            " ");
+
+        // Normalize common patterns
+        normalized = normalized
+            .Replace("> <", "><")
+            .Replace(" {", "{")
+            .Replace("{ ", "{")
+            .Replace(" }", "}")
+            .Replace("} ", "}")
+            .Replace("; ", ";")
+            .Replace(" ;", ";")
+            .Replace(" (", "(")
+            .Replace("( ", "(")
+            .Replace(" )", ")")
+            .Replace(") ", ")")
+            .Replace(" ,", ",")
+            .Replace(", ", ",")
+            .Replace(" =>", "=>")
+            .Replace("=> ", "=>")
+            .Replace(" =", "=")
+            .Replace("= ", "=");
+
+        return normalized;
+    }
+
     [Fact]
     public void TransformSimpleDependencyProperty_ToStyledProperty()
     {
@@ -35,10 +69,30 @@ namespace TestApp
     }
 }";
 
+        /* Expected transformation:
+        using Avalonia;
+        using Avalonia.Controls;
+
+        namespace TestApp
+        {
+            public class MyControl : Control
+            {
+                public static readonly StyledProperty<string> TitleProperty =
+                    AvaloniaProperty.Register<MyControl, string>("Title");
+
+                public string Title
+                {
+                    get => GetValue(TitleProperty);
+                    set => SetValue(TitleProperty, value);
+                }
+            }
+        }
+        */
+
         // Act
         var result = TransformCode(wpfCode);
 
-        // Assert
+        // Assert - verify key transformations happen
         result.Should().Contain("StyledProperty<string>");
         result.Should().Contain("AvaloniaProperty.Register");
         result.Should().NotContain("DependencyProperty");
@@ -70,10 +124,35 @@ namespace TestApp
     }
 }";
 
+        /* Expected transformation:
+        using Avalonia;
+        using Avalonia.Controls;
+
+        namespace TestApp
+        {
+            public class MyControl : Control
+            {
+                private bool _isLoaded = false;
+
+                public static readonly DirectProperty<MyControl, bool> IsLoadedProperty =
+                    AvaloniaProperty.RegisterDirect<MyControl, bool>(
+                        "IsLoaded",
+                        o => o.IsLoaded,
+                        (o, v) => o.IsLoaded = v);
+
+                public bool IsLoaded
+                {
+                    get => _isLoaded;
+                    private set => SetAndRaise(IsLoadedProperty, ref _isLoaded, value);
+                }
+            }
+        }
+        */
+
         // Act
         var result = TransformCode(wpfCode);
 
-        // Assert
+        // Assert - verify key transformations happen
         result.Should().Contain("DirectProperty");
         result.Should().Contain("RegisterDirect");
         result.Should().NotContain("DependencyPropertyKey");
@@ -102,10 +181,30 @@ namespace TestApp
     }
 }";
 
+        /* Expected transformation:
+        using Avalonia;
+        using Avalonia.Controls;
+
+        namespace TestApp
+        {
+            public class DockPanel : Panel
+            {
+                public static readonly AttachedProperty<Dock> DockProperty =
+                    AvaloniaProperty.RegisterAttached<DockPanel, Control, Dock>("Dock");
+
+                public static Dock GetDock(Control element) =>
+                    element.GetValue(DockProperty);
+
+                public static void SetDock(Control element, Dock value) =>
+                    element.SetValue(DockProperty, value);
+            }
+        }
+        */
+
         // Act
         var result = TransformCode(wpfCode);
 
-        // Assert
+        // Assert - verify key transformations happen
         result.Should().Contain("StyledProperty<Dock>");
         result.Should().Contain("RegisterAttached");
         result.Should().NotContain("DependencyProperty.RegisterAttached");
@@ -135,10 +234,30 @@ namespace TestApp
     }
 }";
 
+        /* Expected transformation:
+        using Avalonia;
+        using Avalonia.Controls;
+
+        namespace TestApp
+        {
+            public class MyControl : Control
+            {
+                public static readonly StyledProperty<int> CountProperty =
+                    AvaloniaProperty.Register<MyControl, int>("Count", defaultValue: 0);
+
+                public int Count
+                {
+                    get => GetValue(CountProperty);
+                    set => SetValue(CountProperty, value);
+                }
+            }
+        }
+        */
+
         // Act
         var result = TransformCode(wpfCode);
 
-        // Assert
+        // Assert - verify key transformations happen
         result.Should().Contain("defaultValue: 0");
         result.Should().Contain("StyledProperty<int>");
     }
@@ -172,10 +291,35 @@ namespace TestApp
     }
 }";
 
+        /* Expected transformation:
+        using Avalonia;
+        using Avalonia.Controls;
+
+        namespace TestApp
+        {
+            public class MyControl : Control
+            {
+                public static readonly StyledProperty<double> ValueProperty =
+                    AvaloniaProperty.Register<MyControl, double>("Value", defaultValue: 0.0, notifying: OnValueChanged);
+
+                private static void OnValueChanged(AvaloniaObject d, bool before)
+                {
+                    // Handle change
+                }
+
+                public double Value
+                {
+                    get => GetValue(ValueProperty);
+                    set => SetValue(ValueProperty, value);
+                }
+            }
+        }
+        */
+
         // Act
         var result = TransformCode(wpfCode);
 
-        // Assert
+        // Assert - verify key transformations happen
         result.Should().Contain("notifying: OnValueChanged");
         result.Should().Contain("StyledProperty<double>");
     }
