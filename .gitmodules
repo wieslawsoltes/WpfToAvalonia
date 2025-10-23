@@ -16,3 +16,6 @@
 [submodule "extern/XamlX"]
 	path = extern/XamlX
 	url = https://github.com/wieslawsoltes/XamlX.git
+[submodule "extern/AvaloniaEdit"]
+	path = extern/AvaloniaEdit
+	url = https://github.com/wieslawsoltes/AvaloniaEdit.git
