@@ -44,8 +44,11 @@ public class CompatibilityTransformationTests
     </Window.Resources>
 </Window>";
 
-        // Expected output may vary depending on trigger conversion implementation
-        // This test verifies the trigger is converted to a style selector
+        // Act
+        var result = converter.Convert(wpfXaml);
+
+        // Assert
+        result.Success.Should().BeTrue();
         var expectedPatterns = new[]
         {
             "Selector=",
@@ -54,15 +57,10 @@ public class CompatibilityTransformationTests
             "Red"
         };
 
-        // Act
-        var result = converter.Convert(wpfXaml);
-
-        // Assert
-        result.Success.Should().BeTrue();
         foreach (var pattern in expectedPatterns)
         {
             result.OutputXaml.Should().Contain(pattern,
-                $"converted trigger should contain {pattern}");
+                $"trigger should convert to :pointerover style selector and contain '{pattern}'");
         }
     }
 
@@ -84,6 +82,11 @@ public class CompatibilityTransformationTests
     </Window.Resources>
 </Window>";
 
+        // Act
+        var result = converter.Convert(wpfXaml);
+
+        // Assert
+        result.Success.Should().BeTrue();
         var expectedPatterns = new[]
         {
             "Selector=",
@@ -92,15 +95,10 @@ public class CompatibilityTransformationTests
             "Blue"
         };
 
-        // Act
-        var result = converter.Convert(wpfXaml);
-
-        // Assert
-        result.Success.Should().BeTrue();
         foreach (var pattern in expectedPatterns)
         {
             result.OutputXaml.Should().Contain(pattern,
-                $"converted trigger should contain {pattern}");
+                $"trigger should convert to :pressed style selector and contain '{pattern}'");
         }
     }
 
@@ -122,6 +120,11 @@ public class CompatibilityTransformationTests
     </Window.Resources>
 </Window>";
 
+        // Act
+        var result = converter.Convert(wpfXaml);
+
+        // Assert
+        result.Success.Should().BeTrue();
         var expectedPatterns = new[]
         {
             "Selector=",
@@ -130,15 +133,10 @@ public class CompatibilityTransformationTests
             "Green"
         };
 
-        // Act
-        var result = converter.Convert(wpfXaml);
-
-        // Assert
-        result.Success.Should().BeTrue();
         foreach (var pattern in expectedPatterns)
         {
             result.OutputXaml.Should().Contain(pattern,
-                $"converted trigger should contain {pattern}");
+                $"trigger should convert to :focus style selector and contain '{pattern}'");
         }
     }
 
@@ -160,6 +158,11 @@ public class CompatibilityTransformationTests
     </Window.Resources>
 </Window>";
 
+        // Act
+        var result = converter.Convert(wpfXaml);
+
+        // Assert
+        result.Success.Should().BeTrue();
         var expectedPatterns = new[]
         {
             "Selector=",
@@ -168,15 +171,10 @@ public class CompatibilityTransformationTests
             "Gray"
         };
 
-        // Act
-        var result = converter.Convert(wpfXaml);
-
-        // Assert
-        result.Success.Should().BeTrue();
         foreach (var pattern in expectedPatterns)
         {
             result.OutputXaml.Should().Contain(pattern,
-                $"converted trigger should contain {pattern}");
+                $"trigger should convert to :disabled style selector and contain '{pattern}'");
         }
     }
 
@@ -206,15 +204,19 @@ public class CompatibilityTransformationTests
 
         // Assert
         result.Success.Should().BeTrue();
-        result.OutputXaml.Should().Contain(":pointerover",
-            "first trigger should convert to :pointerover selector");
-        result.OutputXaml.Should().Contain(":pressed",
-            "second trigger should convert to :pressed selector");
+        var expectedPatterns = new[]
+        {
+            "Selector=",
+            ":pointerover",
+            ":pressed",
+            "Background"
+        };
 
-        // Should have multiple Style elements with Selector attribute
-        var styleCount = result.OutputXaml.Split("Selector=").Length - 1;
-        styleCount.Should().BeGreaterThanOrEqualTo(2,
-            "should have at least 2 style selectors for the 2 triggers");
+        foreach (var pattern in expectedPatterns)
+        {
+            result.OutputXaml.Should().Contain(pattern,
+                $"multiple triggers should convert to multiple style selectors and contain '{pattern}'");
+        }
     }
 
     [Fact]
@@ -235,6 +237,11 @@ public class CompatibilityTransformationTests
     </Window.Resources>
 </Window>";
 
+        // Act
+        var result = converter.Convert(wpfXaml);
+
+        // Assert
+        result.Success.Should().BeTrue();
         var expectedPatterns = new[]
         {
             "Selector=",
@@ -243,15 +250,10 @@ public class CompatibilityTransformationTests
             "Orange"
         };
 
-        // Act
-        var result = converter.Convert(wpfXaml);
-
-        // Assert
-        result.Success.Should().BeTrue();
         foreach (var pattern in expectedPatterns)
         {
             result.OutputXaml.Should().Contain(pattern,
-                $"converted trigger should contain {pattern}");
+                $"trigger should convert to :selected style selector and contain '{pattern}'");
         }
     }
 
@@ -273,6 +275,11 @@ public class CompatibilityTransformationTests
     </Window.Resources>
 </Window>";
 
+        // Act
+        var result = converter.Convert(wpfXaml);
+
+        // Assert
+        result.Success.Should().BeTrue();
         var expectedPatterns = new[]
         {
             "Selector=",
@@ -281,15 +288,10 @@ public class CompatibilityTransformationTests
             "Green"
         };
 
-        // Act
-        var result = converter.Convert(wpfXaml);
-
-        // Assert
-        result.Success.Should().BeTrue();
         foreach (var pattern in expectedPatterns)
         {
             result.OutputXaml.Should().Contain(pattern,
-                $"converted trigger should contain {pattern}");
+                $"trigger should convert to :checked style selector and contain '{pattern}'");
         }
     }
 
@@ -313,25 +315,26 @@ public class CompatibilityTransformationTests
     </Window.Resources>
 </Window>";
 
-        var expectedPatterns = new[]
-        {
-            "Background",
-            "White",
-            "Foreground",
-            "Black",
-            ":pointerover",
-            "Red"
-        };
-
         // Act
         var result = converter.Convert(wpfXaml);
 
         // Assert
         result.Success.Should().BeTrue();
+        var expectedPatterns = new[]
+        {
+            "Selector=",
+            ":pointerover",
+            "Background",
+            "White",
+            "Foreground",
+            "Black",
+            "Red"
+        };
+
         foreach (var pattern in expectedPatterns)
         {
             result.OutputXaml.Should().Contain(pattern,
-                $"output should contain {pattern}");
+                $"both regular setters and trigger should be preserved and contain '{pattern}'");
         }
     }
 
