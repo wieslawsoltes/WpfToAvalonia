@@ -1,0 +1,18 @@
+[submodule "extern/Avalonia"]
+	path = extern/Avalonia
+	url = https://github.com/wieslawsoltes/Avalonia.git
+[submodule "extern/wpf"]
+	path = extern/wpf
+	url = https://github.com/wieslawsoltes/wpf.git
+[submodule "extern/avalonia-docs"]
+	path = extern/avalonia-docs
+	url = https://github.com/wieslawsoltes/avalonia-docs.git
+[submodule "extern/XmlParser-Roslyn"]
+	path = extern/XmlParser-Roslyn
+	url = https://github.com/wieslawsoltes/XmlParser-Roslyn.git
+[submodule "extern/roslyn"]
+	path = extern/roslyn
+	url = https://github.com/dotnet/roslyn.git
+[submodule "extern/XamlX"]
+	path = extern/XamlX
+	url = https://github.com/wieslawsoltes/XamlX.git
