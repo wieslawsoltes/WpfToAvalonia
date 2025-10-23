@@ -96,6 +96,13 @@ public sealed class UnifiedXamlElement : UnifiedXamlNode
     /// </summary>
     public bool? XShared { get; set; }
 
+    /// <summary>
+    /// Gets or sets the x:TypeArguments value.
+    /// Used to specify generic type arguments for generic types.
+    /// Example: &lt;generic:GenericControl x:TypeArguments="sys:String"&gt;
+    /// </summary>
+    public string? XTypeArguments { get; set; }
+
     // === Content Properties ===
 
     /// <summary>
@@ -225,6 +232,7 @@ public sealed class UnifiedXamlElement : UnifiedXamlNode
         element.XKey = xElement.Attribute(XNamespace.Get(xamlNamespace) + "Key")?.Value;
         element.XClass = xElement.Attribute(XNamespace.Get(xamlNamespace) + "Class")?.Value;
         element.XFieldModifier = xElement.Attribute(XNamespace.Get(xamlNamespace) + "FieldModifier")?.Value;
+        element.XTypeArguments = xElement.Attribute(XNamespace.Get(xamlNamespace) + "TypeArguments")?.Value;
 
         var xShared = xElement.Attribute(XNamespace.Get(xamlNamespace) + "Shared")?.Value;
         if (xShared != null && bool.TryParse(xShared, out var shared))

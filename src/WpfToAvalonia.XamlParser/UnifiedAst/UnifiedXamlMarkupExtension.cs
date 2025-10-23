@@ -16,6 +16,16 @@ public sealed class UnifiedXamlMarkupExtension : UnifiedXamlNode
     /// </summary>
     public object? SemanticExtension { get; set; }
 
+    /// <summary>
+    /// Gets or sets the XamlX semantic node (alias for SemanticExtension).
+    /// Used by semantic enrichment.
+    /// </summary>
+    public new object? SemanticNode
+    {
+        get => SemanticExtension;
+        set => SemanticExtension = value;
+    }
+
     // === Unified Structure ===
 
     /// <summary>

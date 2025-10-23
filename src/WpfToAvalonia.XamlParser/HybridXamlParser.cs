@@ -3,6 +3,7 @@ using System.Xml.Linq;
 using XamlX.Ast;
 using WpfToAvalonia.Core.Diagnostics;
 using WpfToAvalonia.XamlParser.UnifiedAst;
+using WpfToAvalonia.XamlParser.SemanticEnrichment;
 
 namespace WpfToAvalonia.XamlParser;
 
@@ -207,21 +208,36 @@ public class HybridXamlParser
 
     /// <summary>
     /// Enriches unified AST with semantic information from XamlX.
+    /// Implements task 2.5.4.2: AST transformation and semantic analysis.
     /// </summary>
     private void EnrichWithSemanticInfo(UnifiedXamlDocument unifiedDoc, XamlDocument semanticDoc)
     {
-        // TODO: Implement semantic enrichment
-        // This will:
-        // 1. Walk both ASTs in parallel
-        // 2. Attach type information to unified nodes
-        // 3. Add resolved property metadata
-        // 4. Store markup extension semantic info
-        // 5. Validate consistency between layers
+        try
+        {
+            _diagnostics.AddInfo(
+                "HYBRID_ENRICH_START",
+                "Starting semantic enrichment using SemanticEnricher",
+                null);
 
-        _diagnostics.AddInfo(
-            "HYBRID_ENRICH_PENDING",
-            "Semantic enrichment not yet implemented - placeholder",
-            null);
+            // Task 2.5.4.2.1-2.5.4.2.6: Full semantic enrichment
+            var enricher = new SemanticEnricher(_diagnostics);
+            enricher.Enrich(unifiedDoc, semanticDoc);
+
+            // Task 2.5.4.2.6: Generate semantic model with full type information
+            var semanticModel = enricher.GenerateSemanticModel(unifiedDoc);
+
+            _diagnostics.AddInfo(
+                "HYBRID_ENRICH_COMPLETE",
+                $"Semantic enrichment complete: {semanticModel.EnrichmentPercentage:F1}% of elements enriched",
+                null);
+        }
+        catch (Exception ex)
+        {
+            _diagnostics.AddWarning(
+                "HYBRID_ENRICH_FAILED",
+                $"Semantic enrichment failed but continuing with XML-only mode: {ex.Message}",
+                null);
+        }
     }
 
     /// <summary>

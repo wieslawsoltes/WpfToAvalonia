@@ -161,6 +161,9 @@ public class TransformationPipeline
             new MultiBindingTransformationRule()
         }));
 
+        // Add resource transformer (Priority 45)
+        pipeline.AddTransformer(new ResourceTransformer());
+
         // Add style transformers (Priority 50)
         pipeline.AddTransformer(new RuleBasedTransformer("StyleTransformations", 50, new ITransformationRule[]
         {
@@ -172,6 +175,9 @@ public class TransformationPipeline
             new ConvertedTriggerCleanupRule(),
             new StyleToControlThemeTransformer()
         }));
+
+        // Add template transformer (Priority 55)
+        pipeline.AddTransformer(new TemplateTransformer());
 
         // Add control transformers (Priority 60)
         pipeline.AddTransformer(new RuleBasedTransformer("ControlTransformations", 60, new ITransformationRule[]

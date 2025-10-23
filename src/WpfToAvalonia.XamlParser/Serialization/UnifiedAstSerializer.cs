@@ -193,6 +193,11 @@ public sealed class UnifiedAstSerializer
             xElement.SetAttributeValue(xNamespace + "Shared", element.XShared.Value ? "True" : "False");
         }
 
+        if (!string.IsNullOrEmpty(element.XTypeArguments))
+        {
+            xElement.SetAttributeValue(xNamespace + "TypeArguments", element.XTypeArguments);
+        }
+
         // Serialize regular properties
         foreach (var property in element.Properties)
         {
