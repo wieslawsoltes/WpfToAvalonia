@@ -30,4 +30,11 @@
   <ItemGroup>
     <ProjectReference Include="..\WpfToAvalonia.XamlParser\WpfToAvalonia.XamlParser.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\WpfToAvalonia.Mappings\Data\core-mappings.json">
+      <Link>Data\core-mappings.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
