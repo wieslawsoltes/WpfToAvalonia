@@ -1,0 +1,359 @@
+using FluentAssertions;
+using WpfToAvalonia.XamlParser.TypeSystem;
+using Xunit;
+
+namespace WpfToAvalonia.Tests.UnitTests.XamlParser;
+
+/// <summary>
+/// Unit tests for WPF type system adapter.
+/// Implements task 2.5.8.1.1: Test WPF type system adapter
+/// </summary>
+public class WpfTypeSystemAdapterTests
+{
+    [Fact]
+    public void WpfTypeSystemProvider_Should_LoadWpfAssemblies()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+
+        // Act
+        var typeSystem = provider.GetTypeSystem();
+
+        // Assert
+        typeSystem.Should().NotBeNull("WPF type system should be initialized");
+        typeSystem.Should().BeAssignableTo<IXamlTypeSystem>("Should implement IXamlTypeSystem");
+    }
+
+    [Fact]
+    public void WpfTypeSystem_Should_FindButtonType()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var buttonType = typeSystem.FindType("System.Windows.Controls.Button");
+
+        // Assert
+        buttonType.Should().NotBeNull("Should find Button type from WPF");
+        buttonType?.Name.Should().Be("Button");
+        buttonType?.Namespace.Should().Be("System.Windows.Controls");
+    }
+
+    [Fact]
+    public void WpfTypeSystem_Should_FindTextBoxType()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var textBoxType = typeSystem.FindType("System.Windows.Controls.TextBox");
+
+        // Assert
+        textBoxType.Should().NotBeNull("Should find TextBox type from WPF");
+        textBoxType?.Name.Should().Be("TextBox");
+    }
+
+    [Fact]
+    public void WpfTypeSystem_Should_FindDependencyPropertyType()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var dpType = typeSystem.FindType("System.Windows.DependencyProperty");
+
+        // Assert
+        dpType.Should().NotBeNull("Should find DependencyProperty type from WPF");
+        dpType?.Name.Should().Be("DependencyProperty");
+        dpType?.Namespace.Should().Be("System.Windows");
+    }
+
+    [Fact]
+    public void WpfTypeSystem_Should_FindFrameworkElementType()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var frameworkElementType = typeSystem.FindType("System.Windows.FrameworkElement");
+
+        // Assert
+        frameworkElementType.Should().NotBeNull("Should find FrameworkElement type from WPF");
+        frameworkElementType?.Name.Should().Be("FrameworkElement");
+    }
+
+    [Fact]
+    public void WpfTypeSystem_Should_FindUIElementType()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var uiElementType = typeSystem.FindType("System.Windows.UIElement");
+
+        // Assert
+        uiElementType.Should().NotBeNull("Should find UIElement type from WPF");
+        uiElementType?.Name.Should().Be("UIElement");
+    }
+
+    [Fact]
+    public void WpfTypeSystem_Should_ReturnNullForNonExistentType()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var nonExistentType = typeSystem.FindType("System.Windows.Controls.NonExistentControl");
+
+        // Assert
+        nonExistentType.Should().BeNull("Should return null for non-existent types");
+    }
+
+    [Fact]
+    public void WpfType_Should_HaveCorrectBaseType()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var buttonType = typeSystem.FindType("System.Windows.Controls.Button");
+        var baseType = buttonType?.BaseType;
+
+        // Assert
+        baseType.Should().NotBeNull("Button should have a base type");
+        baseType?.Name.Should().Be("ButtonBase", "Button inherits from ButtonBase");
+    }
+
+    [Fact]
+    public void WpfType_Should_ProvideProperties()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var textBoxType = typeSystem.FindType("System.Windows.Controls.TextBox");
+        var properties = textBoxType?.GetProperties();
+
+        // Assert
+        properties.Should().NotBeNull("TextBox should have properties");
+        properties.Should().Contain(p => p.Name == "Text", "TextBox should have Text property");
+    }
+
+    [Fact]
+    public void WpfType_Should_ProvideEvents()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var buttonType = typeSystem.FindType("System.Windows.Controls.Button");
+        var events = buttonType?.GetEvents();
+
+        // Assert
+        events.Should().NotBeNull("Button should have events");
+        events.Should().Contain(e => e.Name == "Click", "Button should have Click event");
+    }
+
+    [Fact]
+    public void WpfType_Should_IndicateIfValueType()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var buttonType = typeSystem.FindType("System.Windows.Controls.Button");
+        var intType = typeSystem.FindType("System.Int32");
+
+        // Assert
+        buttonType?.IsValueType.Should().BeFalse("Button is a reference type");
+        intType?.IsValueType.Should().BeTrue("Int32 is a value type");
+    }
+
+    [Fact]
+    public void WpfType_Should_IndicateIfEnum()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var visibilityType = typeSystem.FindType("System.Windows.Visibility");
+        var buttonType = typeSystem.FindType("System.Windows.Controls.Button");
+
+        // Assert
+        visibilityType?.IsEnum.Should().BeTrue("Visibility is an enum");
+        buttonType?.IsEnum.Should().BeFalse("Button is not an enum");
+    }
+
+    [Fact]
+    public void WpfType_Should_ProvideEnumValues()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var visibilityType = typeSystem.FindType("System.Windows.Visibility");
+        var fields = visibilityType?.GetFields();
+
+        // Assert
+        fields.Should().NotBeNull("Visibility enum should have fields");
+        fields.Should().Contain(f => f.Name == "Visible", "Visibility should have Visible value");
+        fields.Should().Contain(f => f.Name == "Hidden", "Visibility should have Hidden value");
+        fields.Should().Contain(f => f.Name == "Collapsed", "Visibility should have Collapsed value");
+    }
+
+    [Fact]
+    public void WpfType_Should_FindAttachedProperties()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var gridType = typeSystem.FindType("System.Windows.Controls.Grid");
+        var properties = gridType?.GetProperties();
+
+        // Assert
+        properties.Should().NotBeNull("Grid should have properties");
+        // Grid has attached properties like Row, Column, RowSpan, ColumnSpan
+        // These are typically exposed as static methods GetRow, SetRow, etc.
+    }
+
+    [Fact]
+    public void WpfType_Should_IndicateIfInterface()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var iCommandType = typeSystem.FindType("System.Windows.Input.ICommand");
+        var buttonType = typeSystem.FindType("System.Windows.Controls.Button");
+
+        // Assert
+        iCommandType?.IsInterface.Should().BeTrue("ICommand is an interface");
+        buttonType?.IsInterface.Should().BeFalse("Button is not an interface");
+    }
+
+    [Fact]
+    public void WpfType_Should_ProvideConstructors()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var buttonType = typeSystem.FindType("System.Windows.Controls.Button");
+        var constructors = buttonType?.GetConstructors();
+
+        // Assert
+        constructors.Should().NotBeNull("Button should have constructors");
+        constructors.Should().Contain(c => c.GetParameters().Length == 0,
+            "Button should have a parameterless constructor");
+    }
+
+    [Fact]
+    public void WpfTypeSystem_Should_ResolveGenericTypes()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var observableCollectionType = typeSystem.FindType("System.Collections.ObjectModel.ObservableCollection`1");
+
+        // Assert
+        observableCollectionType.Should().NotBeNull("Should find generic ObservableCollection<T>");
+        observableCollectionType?.IsGenericType.Should().BeTrue("ObservableCollection<T> is a generic type");
+    }
+
+    [Fact]
+    public void WpfTypeSystem_Should_FindMarkupExtensionTypes()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var bindingType = typeSystem.FindType("System.Windows.Data.Binding");
+        var staticResourceType = typeSystem.FindType("System.Windows.StaticResourceExtension");
+
+        // Assert
+        bindingType.Should().NotBeNull("Should find Binding markup extension");
+        staticResourceType.Should().NotBeNull("Should find StaticResourceExtension");
+    }
+
+    [Fact]
+    public void WpfTypeSystem_Should_FindResourceDictionaryType()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var resourceDictionaryType = typeSystem.FindType("System.Windows.ResourceDictionary");
+
+        // Assert
+        resourceDictionaryType.Should().NotBeNull("Should find ResourceDictionary type");
+        resourceDictionaryType?.Name.Should().Be("ResourceDictionary");
+    }
+
+    [Fact]
+    public void WpfTypeSystem_Should_HandleNamespaceQueries()
+    {
+        // Arrange
+        var provider = new WpfTypeSystemProvider();
+        var typeSystem = provider.GetTypeSystem();
+
+        // Act
+        var controlsTypes = typeSystem.GetTypesInNamespace("System.Windows.Controls");
+
+        // Assert
+        controlsTypes.Should().NotBeNull("Should find types in System.Windows.Controls namespace");
+        controlsTypes.Should().Contain(t => t.Name == "Button");
+        controlsTypes.Should().Contain(t => t.Name == "TextBox");
+        controlsTypes.Should().Contain(t => t.Name == "Grid");
+    }
+
+    [Fact]
+    public void ReflectionTypeSystem_Should_WrapSystemTypes()
+    {
+        // Arrange
+        var reflectionTypeSystem = new ReflectionTypeSystem();
+
+        // Act
+        var stringType = reflectionTypeSystem.FindType("System.String");
+        var int32Type = reflectionTypeSystem.FindType("System.Int32");
+
+        // Assert
+        stringType.Should().NotBeNull("Should wrap System.String");
+        stringType?.Name.Should().Be("String");
+        int32Type.Should().NotBeNull("Should wrap System.Int32");
+        int32Type?.IsValueType.Should().BeTrue();
+    }
+
+    [Fact]
+    public void ReflectionTypeSystem_Should_HandleArrayTypes()
+    {
+        // Arrange
+        var reflectionTypeSystem = new ReflectionTypeSystem();
+
+        // Act
+        var stringArrayType = reflectionTypeSystem.FindType("System.String[]");
+
+        // Assert
+        stringArrayType.Should().NotBeNull("Should handle array types");
+        stringArrayType?.IsArray.Should().BeTrue();
+    }
+}
