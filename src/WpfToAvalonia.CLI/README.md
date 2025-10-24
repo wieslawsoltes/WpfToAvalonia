@@ -10,13 +10,96 @@ dotnet build src/WpfToAvalonia.CLI/WpfToAvalonia.CLI.csproj
 
 ## Usage
 
-The CLI provides five main commands:
+The CLI provides six main commands:
 
-1. **transform** - Transform XAML files only
-2. **transform-csharp** - Transform C# files only
-3. **transform-project** - Transform entire project (XAML + C#)
-4. **analyze** - Analyze XAML files without transformation
-5. **config** - Manage migration configuration files
+1. **migrate** - **NEW!** End-to-end project migration with 7-stage orchestration
+2. **transform** - Transform XAML files only
+3. **transform-csharp** - Transform C# files only
+4. **transform-project** - Transform entire project (XAML + C#)
+5. **analyze** - Analyze XAML files without transformation
+6. **config** - Manage migration configuration files
+
+### Migrate Command (Recommended)
+
+**NEW!** Orchestrates complete end-to-end WPF project migration using the 7-stage pipeline:
+
+1. **Analysis** - Detect WPF usage and analyze project structure
+2. **Backup** - Create backup of original files (optional)
+3. **Transform Project File** - Convert .csproj to Avalonia
+4. **Transform XAML Files** - Convert all XAML files
+5. **Transform C# Files** - Convert C# code-behind and classes
+6. **Validation** - Verify transformed output
+7. **Write Files** - Write transformed files to disk (unless dry-run)
+
+```bash
+dotnet run --project src/WpfToAvalonia.CLI/WpfToAvalonia.CLI.csproj -- migrate [options]
+```
+
+**Options:**
+- `-p, --project <path>` (required) - Path to WPF project file (.csproj) to migrate
+- `-o, --output <path>` - Output project path (defaults to `<project>.Avalonia.csproj`)
+- `-d, --dry-run` - Perform migration analysis without writing files (default: `false`)
+- `-b, --backup` - Create backup of original files before migration (default: `true`)
+- `--backup-dir <dir>` - Backup directory name (default: `.migration-backup`)
+- `--rename-xaml` - Rename .xaml files to .axaml (default: `true`)
+- `--avalonia-version <version>` - Avalonia version to use (default: `11.2.2`)
+- `--target-framework <framework>` - Target framework (e.g., `net8.0`)
+- `--compiled-bindings` - Enable compiled bindings (default: `true`)
+- `-v, --verbose` - Enable verbose output with detailed diagnostics
+- `-c, --config <path>` - Configuration file path
+
+**Examples:**
+
+Migrate a WPF project (recommended approach):
+```bash
+dotnet run --project src/WpfToAvalonia.CLI/WpfToAvalonia.CLI.csproj -- migrate -p ./MyWpfApp/MyWpfApp.csproj
+```
+
+Dry run to preview migration:
+```bash
+dotnet run --project src/WpfToAvalonia.CLI/WpfToAvalonia.CLI.csproj -- migrate -p ./MyWpfApp/MyWpfApp.csproj --dry-run -v
+```
+
+Migrate without creating backup (not recommended):
+```bash
+dotnet run --project src/WpfToAvalonia.CLI/WpfToAvalonia.CLI.csproj -- migrate -p ./MyWpfApp/MyWpfApp.csproj --backup false
+```
+
+Migrate with custom Avalonia version and target framework:
+```bash
+dotnet run --project src/WpfToAvalonia.CLI/WpfToAvalonia.CLI.csproj -- migrate -p ./MyWpfApp/MyWpfApp.csproj --avalonia-version 11.1.0 --target-framework net7.0
+```
+
+**Output:**
+```
+WPF to Avalonia Migration Tool
+================================
+
+Project: ./MyWpfApp/MyWpfApp.csproj
+
+Starting migration...
+
+Migration Stages
+================
+✓ Analysis       (42ms) Analyzing WPF project...
+✓ Backup         (15ms) Creating backup of original files...
+✓ ProjectFile    (23ms) Transforming project file...
+✓ XAML           (156ms) Transforming XAML files...
+✓ CSharp         (89ms) Transforming C# files...
+✓ Validation     (12ms) Validating transformed output...
+✓ Writing        (34ms) Writing transformed files to disk...
+
+Migration Summary
+=================
+XAML Files:   5/5 successful
+C# Files:     12 processed
+Elapsed Time: 0.4s
+
+Warnings: 3
+Errors:   0
+
+✓ Migration complete! Output: ./MyWpfApp/MyWpfApp.Avalonia.csproj
+```
 
 ### Transform Command
 
@@ -330,7 +413,7 @@ The CLI tool uses the WpfToAvalonia transformation pipeline:
 
 ## Testing
 
-All transformation features are covered by 188 passing unit and integration tests.
+All transformation features are covered by 380 passing unit and integration tests.
 
 ## Future Enhancements
 

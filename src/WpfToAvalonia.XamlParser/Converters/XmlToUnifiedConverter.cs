@@ -444,13 +444,13 @@ public sealed class XmlToUnifiedConverter
         var previousNode = element.PreviousNode;
         if (previousNode is XText textBefore)
         {
-            hints.LeadingWhitespace = textBefore.Value;
+            hints.LeadingWhitespace = NormalizeLeadingWhitespace(textBefore.Value);
         }
 
         var nextNode = element.NextNode;
         if (nextNode is XText textAfter)
         {
-            hints.TrailingWhitespace = textAfter.Value;
+            hints.TrailingWhitespace = NormalizeTrailingWhitespace(textAfter.Value);
             hints.HasNewlineAfter = textAfter.Value.Contains('\n');
         }
 
@@ -462,6 +462,60 @@ public sealed class XmlToUnifiedConverter
         );
 
         return hints;
+    }
+
+    /// <summary>
+    /// Normalizes leading whitespace to prevent extra blank lines.
+    /// Keeps only the last newline with its indentation.
+    /// </summary>
+    private string NormalizeLeadingWhitespace(string whitespace)
+    {
+        if (string.IsNullOrEmpty(whitespace))
+            return whitespace;
+
+        // Check if there are any newlines
+        if (!whitespace.Contains('\n') && !whitespace.Contains('\r'))
+            return whitespace;
+
+        // Split by newlines (handle both \r\n and \n)
+        var lines = whitespace.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+
+        // If there are multiple lines (meaning multiple newlines), keep only the last line as indentation
+        // For example: "\n    \n    " becomes "\n    " (single newline + last indentation)
+        if (lines.Length > 1)
+        {
+            // Return: newline + the indentation from the last line
+            return "\n" + lines[^1];
+        }
+
+        // Single line - return as is (shouldn't happen if we got here, but safety check)
+        return whitespace;
+    }
+
+    /// <summary>
+    /// Normalizes trailing whitespace to prevent extra blank lines.
+    /// Keeps only the first newline with minimal formatting.
+    /// </summary>
+    private string NormalizeTrailingWhitespace(string whitespace)
+    {
+        if (string.IsNullOrEmpty(whitespace))
+            return whitespace;
+
+        // Check if there are any newlines
+        if (!whitespace.Contains('\n') && !whitespace.Contains('\r'))
+            return whitespace;
+
+        // Split by newlines (handle both \r\n and \n)
+        var lines = whitespace.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+
+        // Keep first newline and the indentation that follows
+        if (lines.Length > 1)
+        {
+            return "\n" + lines[1];
+        }
+
+        // Just a newline
+        return "\n";
     }
 
     /// <summary>

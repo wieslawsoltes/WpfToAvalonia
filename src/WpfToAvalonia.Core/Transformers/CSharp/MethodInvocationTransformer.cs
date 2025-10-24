@@ -79,9 +79,19 @@ public sealed class MethodInvocationTransformer : CSharpSyntaxRewriter
         var methodName = GetFullMethodName(memberAccess);
 
         // Get type information for the expression
-        var symbolInfo = _semanticModel.GetSymbolInfo(memberAccess.Expression);
-        var typeInfo = _semanticModel.GetTypeInfo(memberAccess.Expression);
-        var typeName = typeInfo.Type?.ToDisplayString() ?? "";
+        // Try to get semantic information, but handle cases where node isn't in tree
+        string typeName = "";
+        try
+        {
+            var symbolInfo = _semanticModel.GetSymbolInfo(memberAccess.Expression);
+            var typeInfo = _semanticModel.GetTypeInfo(memberAccess.Expression);
+            typeName = typeInfo.Type?.ToDisplayString() ?? "";
+        }
+        catch (ArgumentException)
+        {
+            // Node is not in the semantic model's tree (created by previous transformer)
+            // Fall back to syntax-based matching only
+        }
 
         // Transform Dispatcher methods
         if (IsDispatcherMethod(methodName, typeName))

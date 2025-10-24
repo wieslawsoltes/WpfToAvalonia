@@ -54,31 +54,92 @@ public sealed class CSharpConverterService
             root = usingRewriter.Visit(root);
 
             // Re-compile for updated semantic model
+            var oldTree = tree;
             tree = tree.WithRootAndOptions(root, tree.Options);
-            compilation = compilation.ReplaceSyntaxTree(compilation.SyntaxTrees.First(), tree);
+            compilation = compilation.ReplaceSyntaxTree(oldTree, tree);
             semanticModel = compilation.GetSemanticModel(tree);
+            root = tree.GetRoot(); // Get root from new tree
 
             // Step 2: Transform type references
             var typeRewriter = new TypeReferenceRewriter(semanticModel, diagnostics, _mappingRepository);
             root = typeRewriter.Visit(root);
 
             // Re-compile for updated semantic model
+            oldTree = tree;
             tree = tree.WithRootAndOptions(root, tree.Options);
-            compilation = compilation.ReplaceSyntaxTree(compilation.SyntaxTrees.First(), tree);
+            compilation = compilation.ReplaceSyntaxTree(oldTree, tree);
             semanticModel = compilation.GetSemanticModel(tree);
+            root = tree.GetRoot(); // Get root from new tree
 
             // Step 3: Transform property access
             var propertyRewriter = new PropertyAccessRewriter(semanticModel, diagnostics, _mappingRepository);
             root = propertyRewriter.Visit(root);
 
             // Re-compile for updated semantic model
+            oldTree = tree;
             tree = tree.WithRootAndOptions(root, tree.Options);
-            compilation = compilation.ReplaceSyntaxTree(compilation.SyntaxTrees.First(), tree);
+            compilation = compilation.ReplaceSyntaxTree(oldTree, tree);
             semanticModel = compilation.GetSemanticModel(tree);
+            root = tree.GetRoot(); // Get root from new tree
 
             // Step 4: Transform dependency properties
             var dpTransformer = new DependencyPropertyTransformer(diagnostics, semanticModel);
             root = dpTransformer.Visit(root);
+
+            // Re-compile for updated semantic model
+            oldTree = tree;
+            tree = tree.WithRootAndOptions(root, tree.Options);
+            compilation = compilation.ReplaceSyntaxTree(oldTree, tree);
+            semanticModel = compilation.GetSemanticModel(tree);
+            root = tree.GetRoot(); // Get root from new tree
+
+            // Step 5: Transform method invocations (VisualTreeHelper, LogicalTreeHelper, Keyboard.Focus)
+            var methodInvocationTransformer = new MethodInvocationTransformer(diagnostics, semanticModel);
+            root = methodInvocationTransformer.Visit(root);
+
+            // Re-compile for updated semantic model
+            oldTree = tree;
+            tree = tree.WithRootAndOptions(root, tree.Options);
+            compilation = compilation.ReplaceSyntaxTree(oldTree, tree);
+            semanticModel = compilation.GetSemanticModel(tree);
+            root = tree.GetRoot(); // Get root from new tree
+
+            // Step 6: Transform threading model (Dispatcher)
+            var threadingRewriter = new ThreadingModelRewriter(semanticModel, diagnostics, _mappingRepository);
+            root = threadingRewriter.Visit(root);
+
+            // Re-compile for updated semantic model
+            oldTree = tree;
+            tree = tree.WithRootAndOptions(root, tree.Options);
+            compilation = compilation.ReplaceSyntaxTree(oldTree, tree);
+            semanticModel = compilation.GetSemanticModel(tree);
+            root = tree.GetRoot(); // Get root from new tree
+
+            // Step 7: Transform commands (RoutedCommand, CommandBinding)
+            var commandRewriter = new CommandRewriter(semanticModel, diagnostics, _mappingRepository);
+            root = commandRewriter.Visit(root);
+
+            // Re-compile for updated semantic model
+            oldTree = tree;
+            tree = tree.WithRootAndOptions(root, tree.Options);
+            compilation = compilation.ReplaceSyntaxTree(oldTree, tree);
+            semanticModel = compilation.GetSemanticModel(tree);
+            root = tree.GetRoot(); // Get root from new tree
+
+            // Step 8: Transform event handlers
+            var eventHandlerRewriter = new EventHandlerRewriter(semanticModel, diagnostics, _mappingRepository);
+            root = eventHandlerRewriter.Visit(root);
+
+            // Re-compile for updated semantic model
+            oldTree = tree;
+            tree = tree.WithRootAndOptions(root, tree.Options);
+            compilation = compilation.ReplaceSyntaxTree(oldTree, tree);
+            semanticModel = compilation.GetSemanticModel(tree);
+            root = tree.GetRoot(); // Get root from new tree
+
+            // Step 9: Transform resource access (FindResource, TryFindResource)
+            var resourceAccessRewriter = new ResourceAccessRewriter(semanticModel, diagnostics, _mappingRepository);
+            root = resourceAccessRewriter.Visit(root);
 
             return root.ToFullString();
         }
@@ -86,7 +147,7 @@ public sealed class CSharpConverterService
         {
             diagnostics.AddError(
                 "CSHARP_CONVERSION_ERROR",
-                $"C# conversion failed: {ex.Message}",
+                $"C# conversion failed: {ex.Message}\nStack trace: {ex.StackTrace}",
                 null);
             return sourceCode; // Return original on error
         }

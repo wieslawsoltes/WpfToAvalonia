@@ -55,7 +55,9 @@ public sealed class XamlWriter
         // Write leading whitespace/comments if preserving formatting
         if (_options.PreserveFormatting && element.Formatting.LeadingWhitespace != null)
         {
-            _output.Append(element.Formatting.LeadingWhitespace);
+            // Normalize whitespace to prevent extra blank lines
+            var whitespace = NormalizeLeadingWhitespace(element.Formatting.LeadingWhitespace);
+            _output.Append(whitespace);
         }
         else if (!_options.PreserveFormatting)
         {
@@ -97,11 +99,18 @@ public sealed class XamlWriter
             // Write text content if any
             if (!string.IsNullOrEmpty(element.TextContent))
             {
-                if (_options.PreserveFormatting && element.Formatting.InnerWhitespace != null)
+                // When preserving formatting, skip whitespace-only TextContent
+                // because whitespace between elements is handled by LeadingWhitespace
+                var isWhitespaceOnly = string.IsNullOrWhiteSpace(element.TextContent);
+
+                if (!(_options.PreserveFormatting && isWhitespaceOnly))
                 {
-                    _output.Append(element.Formatting.InnerWhitespace);
+                    if (_options.PreserveFormatting && element.Formatting.InnerWhitespace != null)
+                    {
+                        _output.Append(element.Formatting.InnerWhitespace);
+                    }
+                    _output.Append(element.TextContent);
                 }
-                _output.Append(element.TextContent);
             }
             else if (hasContent && !_options.PreserveFormatting)
             {
@@ -396,5 +405,33 @@ public sealed class XamlWriter
             .Replace("\"", "&quot;")
             .Replace("<", "&lt;")
             .Replace(">", "&gt;");
+    }
+
+    /// <summary>
+    /// Normalizes leading whitespace to prevent extra blank lines.
+    /// Keeps only the last newline with its indentation.
+    /// </summary>
+    private string NormalizeLeadingWhitespace(string whitespace)
+    {
+        if (string.IsNullOrEmpty(whitespace))
+            return whitespace;
+
+        // Check if there are any newlines
+        if (!whitespace.Contains('\n') && !whitespace.Contains('\r'))
+            return whitespace;
+
+        // Split by newlines (handle both \r\n and \n)
+        var lines = whitespace.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+
+        // If there are multiple lines (meaning multiple newlines), keep only the last line as indentation
+        // For example: "\n    \n    " becomes "\n    " (single newline + last indentation)
+        if (lines.Length > 1)
+        {
+            // Return: newline + the indentation from the last line
+            return "\n" + lines[^1];
+        }
+
+        // Single line - return as is (shouldn't happen if we got here, but safety check)
+        return whitespace;
     }
 }

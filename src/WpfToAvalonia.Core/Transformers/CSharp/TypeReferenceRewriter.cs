@@ -13,6 +13,7 @@ namespace WpfToAvalonia.Core.Transformers.CSharp;
 public sealed class TypeReferenceRewriter : WpfToAvaloniaRewriter
 {
     private int _typeReferencesChanged;
+    private readonly Dictionary<string, TypeMapping> _syntaxBasedMappings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TypeReferenceRewriter"/> class.
@@ -26,6 +27,31 @@ public sealed class TypeReferenceRewriter : WpfToAvaloniaRewriter
         IMappingRepository mappingRepository)
         : base(semanticModel, diagnostics, mappingRepository)
     {
+        _syntaxBasedMappings = InitializeSyntaxBasedMappings();
+    }
+
+    /// <summary>
+    /// Creates a dictionary of simple type name to type mapping for syntax-based fallback.
+    /// This allows transformation to work even when semantic model cannot resolve types.
+    /// </summary>
+    private Dictionary<string, TypeMapping> InitializeSyntaxBasedMappings()
+    {
+        var mappings = new Dictionary<string, TypeMapping>(StringComparer.Ordinal);
+
+        foreach (var mapping in MappingRepository.GetAllTypeMappings())
+        {
+            // Use simple type name as key (e.g., "DependencyObject" not "System.Windows.DependencyObject")
+            if (!string.IsNullOrEmpty(mapping.SimpleTypeName))
+            {
+                // Avoid duplicates - first mapping wins
+                if (!mappings.ContainsKey(mapping.SimpleTypeName))
+                {
+                    mappings[mapping.SimpleTypeName] = mapping;
+                }
+            }
+        }
+
+        return mappings;
     }
 
     /// <summary>
@@ -33,46 +59,77 @@ public sealed class TypeReferenceRewriter : WpfToAvaloniaRewriter
     /// </summary>
     public override SyntaxNode? VisitIdentifierName(IdentifierNameSyntax node)
     {
+        // Try semantic-based transformation first
         SymbolInfo symbolInfo;
+        ITypeSymbol? typeSymbol = null;
+        bool useSemanticAnalysis = false;
+
         try
         {
             symbolInfo = SemanticModel.GetSymbolInfo(node);
+            typeSymbol = symbolInfo.Symbol as ITypeSymbol;
+
+            if (typeSymbol != null && IsWpfType(typeSymbol))
+            {
+                useSemanticAnalysis = true;
+                var fullTypeName = GetFullTypeName(typeSymbol).Replace("global::", "");
+                var mapping = MappingRepository.FindTypeMapping(fullTypeName);
+
+                if (mapping != null)
+                {
+                    return TransformTypeReference(node, mapping);
+                }
+
+                // No mapping found, report warning
+                var lineSpan = node.GetLocation().GetLineSpan();
+                Diagnostics.AddWarning(
+                    DiagnosticCodes.TypeMappingNotFound,
+                    $"No mapping found for WPF type: {fullTypeName}",
+                    lineSpan.Path,
+                    lineSpan.StartLinePosition.Line + 1,
+                    lineSpan.StartLinePosition.Character + 1);
+            }
         }
         catch
         {
-            // Node might not exist in semantic model after previous transformations
-            return base.VisitIdentifierName(node);
+            // Semantic analysis failed - fall back to syntax-based transformation
         }
 
-        var typeSymbol = symbolInfo.Symbol as ITypeSymbol;
-
-        if (typeSymbol == null)
+        // If semantic analysis didn't work or type wasn't resolved, try syntax-based fallback
+        if (!useSemanticAnalysis)
         {
-            return base.VisitIdentifierName(node);
+            var syntaxResult = TrySyntaxBasedTransformation(node);
+            if (syntaxResult != null)
+            {
+                return syntaxResult;
+            }
         }
 
-        if (!IsWpfType(typeSymbol))
+        return base.VisitIdentifierName(node);
+    }
+
+    /// <summary>
+    /// Attempts to transform a type reference using syntax-based matching.
+    /// This fallback is used when semantic analysis cannot resolve the type.
+    /// </summary>
+    private SyntaxNode? TrySyntaxBasedTransformation(IdentifierNameSyntax node)
+    {
+        var typeName = node.Identifier.Text;
+
+        // Look up the type name in our syntax-based mappings
+        if (_syntaxBasedMappings.TryGetValue(typeName, out var mapping))
         {
-            return base.VisitIdentifierName(node);
+            return TransformTypeReference(node, mapping);
         }
 
-        var fullTypeName = GetFullTypeName(typeSymbol).Replace("global::", "");
-        var mapping = MappingRepository.FindTypeMapping(fullTypeName);
+        return null;
+    }
 
-        if (mapping == null)
-        {
-            // No mapping found, report warning
-            var lineSpan = node.GetLocation().GetLineSpan();
-            Diagnostics.AddWarning(
-                DiagnosticCodes.TypeMappingNotFound,
-                $"No mapping found for WPF type: {fullTypeName}",
-                lineSpan.Path,
-                lineSpan.StartLinePosition.Line + 1,
-                lineSpan.StartLinePosition.Character + 1);
-
-            return base.VisitIdentifierName(node);
-        }
-
+    /// <summary>
+    /// Transforms a type reference node using the provided mapping.
+    /// </summary>
+    private SyntaxNode TransformTypeReference(IdentifierNameSyntax node, TypeMapping mapping)
+    {
         // Get the simple type name for the Avalonia type
         var avaloniaTypeName = mapping.TypeNameChanged
             ? GetSimpleTypeName(mapping.AvaloniaTypeName)

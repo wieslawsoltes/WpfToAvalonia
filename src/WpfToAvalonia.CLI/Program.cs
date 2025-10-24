@@ -13,6 +13,7 @@ class Program
         };
 
         // Add commands
+        rootCommand.AddCommand(MigrateCommand.Create());
         rootCommand.AddCommand(TransformCommand.Create());
         rootCommand.AddCommand(TransformCSharpCommand.Create());
         rootCommand.AddCommand(TransformProjectCommand.Create());

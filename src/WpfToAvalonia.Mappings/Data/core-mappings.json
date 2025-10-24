@@ -273,6 +273,134 @@
       "notes": "UIElement maps to Visual or Control depending on usage",
       "requiresManualReview": true,
       "category": "Core"
+    },
+    {
+      "wpfTypeName": "System.Windows.DependencyPropertyChangedEventArgs",
+      "avaloniaTypeName": "Avalonia.AvaloniaPropertyChangedEventArgs",
+      "wpfNamespace": "System.Windows",
+      "avaloniaNamespace": "Avalonia",
+      "simpleTypeName": "DependencyPropertyChangedEventArgs",
+      "typeNameChanged": true,
+      "notes": "Event args for dependency property change callbacks",
+      "category": "Core"
+    },
+    {
+      "wpfTypeName": "System.Windows.PropertyMetadata",
+      "avaloniaTypeName": "Avalonia.Data.PropertyMetadata",
+      "wpfNamespace": "System.Windows",
+      "avaloniaNamespace": "Avalonia.Data",
+      "simpleTypeName": "PropertyMetadata",
+      "typeNameChanged": false,
+      "notes": "Property metadata for dependency properties. Avalonia has simpler metadata model",
+      "requiresManualReview": true,
+      "category": "Core"
+    },
+    {
+      "wpfTypeName": "System.Windows.FrameworkPropertyMetadata",
+      "avaloniaTypeName": "Avalonia.Data.PropertyMetadata",
+      "wpfNamespace": "System.Windows",
+      "avaloniaNamespace": "Avalonia.Data",
+      "simpleTypeName": "FrameworkPropertyMetadata",
+      "typeNameChanged": true,
+      "notes": "Framework property metadata maps to basic PropertyMetadata in Avalonia",
+      "requiresManualReview": true,
+      "category": "Core"
+    },
+    {
+      "wpfTypeName": "System.Windows.UIPropertyMetadata",
+      "avaloniaTypeName": "Avalonia.Data.PropertyMetadata",
+      "wpfNamespace": "System.Windows",
+      "avaloniaNamespace": "Avalonia.Data",
+      "simpleTypeName": "UIPropertyMetadata",
+      "typeNameChanged": true,
+      "notes": "UI property metadata maps to basic PropertyMetadata in Avalonia",
+      "requiresManualReview": true,
+      "category": "Core"
+    },
+    {
+      "wpfTypeName": "System.Windows.CoerceValueCallback",
+      "avaloniaTypeName": "System.Func<Avalonia.AvaloniaObject, object, object>",
+      "wpfNamespace": "System.Windows",
+      "avaloniaNamespace": "System",
+      "simpleTypeName": "CoerceValueCallback",
+      "typeNameChanged": true,
+      "notes": "Coerce callback is a Func delegate in Avalonia",
+      "requiresManualReview": true,
+      "category": "Core"
+    },
+    {
+      "wpfTypeName": "System.Windows.ValidateValueCallback",
+      "avaloniaTypeName": "System.Func<object, bool>",
+      "wpfNamespace": "System.Windows",
+      "avaloniaNamespace": "System",
+      "simpleTypeName": "ValidateValueCallback",
+      "typeNameChanged": true,
+      "notes": "Validate callback is a Func<object, bool> delegate in Avalonia",
+      "requiresManualReview": true,
+      "category": "Core"
+    },
+    {
+      "wpfTypeName": "System.Windows.PropertyChangedCallback",
+      "avaloniaTypeName": "System.Action<Avalonia.AvaloniaObject, Avalonia.AvaloniaPropertyChangedEventArgs>",
+      "wpfNamespace": "System.Windows",
+      "avaloniaNamespace": "System",
+      "simpleTypeName": "PropertyChangedCallback",
+      "typeNameChanged": true,
+      "notes": "Property changed callback is typically a lambda or method in Avalonia",
+      "requiresManualReview": true,
+      "category": "Core"
+    },
+    {
+      "wpfTypeName": "System.Windows.RoutedEventArgs",
+      "avaloniaTypeName": "Avalonia.Interactivity.RoutedEventArgs",
+      "wpfNamespace": "System.Windows",
+      "avaloniaNamespace": "Avalonia.Interactivity",
+      "simpleTypeName": "RoutedEventArgs",
+      "typeNameChanged": false,
+      "notes": "Routed event arguments",
+      "category": "Events"
+    },
+    {
+      "wpfTypeName": "System.Windows.RoutedEvent",
+      "avaloniaTypeName": "Avalonia.Interactivity.RoutedEvent",
+      "wpfNamespace": "System.Windows",
+      "avaloniaNamespace": "Avalonia.Interactivity",
+      "simpleTypeName": "RoutedEvent",
+      "typeNameChanged": false,
+      "notes": "Routed event definition",
+      "category": "Events"
+    },
+    {
+      "wpfTypeName": "System.Windows.Threading.DispatcherObject",
+      "avaloniaTypeName": "Avalonia.Threading.DispatcherObject",
+      "wpfNamespace": "System.Windows.Threading",
+      "avaloniaNamespace": "Avalonia.Threading",
+      "simpleTypeName": "DispatcherObject",
+      "typeNameChanged": false,
+      "notes": "Base class for objects with thread affinity. Avalonia uses different threading model",
+      "requiresManualReview": true,
+      "category": "Threading"
+    },
+    {
+      "wpfTypeName": "System.Windows.Threading.DispatcherPriority",
+      "avaloniaTypeName": "Avalonia.Threading.DispatcherPriority",
+      "wpfNamespace": "System.Windows.Threading",
+      "avaloniaNamespace": "Avalonia.Threading",
+      "simpleTypeName": "DispatcherPriority",
+      "typeNameChanged": false,
+      "notes": "Dispatcher priority enumeration",
+      "category": "Threading"
+    },
+    {
+      "wpfTypeName": "System.Windows.DependencyPropertyKey",
+      "avaloniaTypeName": "Avalonia.DirectProperty",
+      "wpfNamespace": "System.Windows",
+      "avaloniaNamespace": "Avalonia",
+      "simpleTypeName": "DependencyPropertyKey",
+      "typeNameChanged": true,
+      "notes": "Read-only dependency property key. Use DirectProperty pattern in Avalonia instead",
+      "requiresManualReview": true,
+      "category": "Core"
     }
   ],
   "propertyMappings": [
