@@ -94,8 +94,10 @@ public sealed class ResourceAccessRewriter : WpfToAvaloniaRewriter
     }
 
     /// <summary>
-    /// Visits invocation expressions to handle FindResource and TryFindResource calls.
-    /// Task 2.5.1.1: Transform Application.Current.Resources access (includes FindResource)
+    /// Visits invocation expressions to handle FindResource, TryFindResource, and SetResourceReference calls.
+    /// Tasks:
+    /// - 2.5.1.2: Update FindResource/TryFindResource calls
+    /// - 2.5.1.3: Handle dynamic resource references (SetResourceReference)
     /// </summary>
     public override SyntaxNode? VisitInvocationExpression(InvocationExpressionSyntax node)
     {
@@ -103,6 +105,7 @@ public sealed class ResourceAccessRewriter : WpfToAvaloniaRewriter
         {
             var methodName = memberAccess.Name.Identifier.Text;
 
+            // Task 2.5.1.2: Handle FindResource and TryFindResource
             if (methodName == "FindResource" || methodName == "TryFindResource")
             {
                 var symbolInfo = TryGetSymbolInfo(memberAccess);
@@ -124,6 +127,64 @@ public sealed class ResourceAccessRewriter : WpfToAvaloniaRewriter
 
                         // Note: Avalonia also has FindResource/TryFindResource methods
                         // The signature is compatible, so we just track the transformation
+                    }
+                }
+            }
+            // Task 2.5.1.3: Handle SetResourceReference (dynamic resource references)
+            else if (methodName == "SetResourceReference")
+            {
+                var symbolInfo = TryGetSymbolInfo(memberAccess);
+                if (symbolInfo.HasValue && symbolInfo.Value.Symbol is IMethodSymbol methodSymbol)
+                {
+                    var containingType = methodSymbol.ContainingType?.ToDisplayString();
+
+                    // Check if this is WPF SetResourceReference
+                    if (containingType == "System.Windows.FrameworkElement" ||
+                        containingType == "System.Windows.FrameworkContentElement")
+                    {
+                        _dynamicResourceTransformed++;
+
+                        // Extract the resource key if possible
+                        var resourceKey = node.ArgumentList.Arguments.Count > 1
+                            ? node.ArgumentList.Arguments[1].ToString()
+                            : "unknown";
+
+                        Diagnostics.AddWarning(
+                            "SET_RESOURCE_REFERENCE_NEEDS_CONVERSION",
+                            $"SetResourceReference({resourceKey}) requires manual conversion in Avalonia. " +
+                            $"Use property binding with DynamicResource in XAML or subscribe to ResourceDictionary changes in code-behind. " +
+                            $"Alternative: Use FindResource() and update property manually, or use reactive bindings with Avalonia.Reactive.",
+                            null);
+
+                        // Note: Avalonia doesn't have a direct equivalent to SetResourceReference
+                        // Users need to either:
+                        // 1. Use {DynamicResource} in XAML
+                        // 2. Subscribe to resource changes manually
+                        // 3. Use Avalonia's reactive framework
+                    }
+                }
+            }
+            // Task 2.5.1.3: Handle GetValue with DependencyProperty for dynamic resources
+            else if (methodName == "GetValue" || methodName == "SetValue")
+            {
+                // These are handled by DependencyPropertyRewriter
+                // But we check if they're being used with resource-related properties
+                var symbolInfo = TryGetSymbolInfo(memberAccess);
+                if (symbolInfo.HasValue && symbolInfo.Value.Symbol is IMethodSymbol methodSymbol)
+                {
+                    var containingType = methodSymbol.ContainingType?.ToDisplayString();
+
+                    if (containingType == "System.Windows.DependencyObject" && node.ArgumentList.Arguments.Count > 0)
+                    {
+                        // Check if the first argument references a resource-related property
+                        var firstArg = node.ArgumentList.Arguments[0].ToString();
+                        if (firstArg.Contains("Property") && firstArg.Contains("Resource"))
+                        {
+                            Diagnostics.AddInfo(
+                                "RESOURCE_DEPENDENCY_PROPERTY_ACCESS",
+                                $"Dependency property access involving resources: {firstArg}. Verify Avalonia equivalent.",
+                                null);
+                        }
                     }
                 }
             }
