@@ -260,6 +260,77 @@ public sealed class CSharpFileTransformer : ITransformer
             syntaxRoot = attributeRewriter.Visit(syntaxRoot);
         }
 
+        // Apply code-behind transformation (Task 2.5.6.2)
+        document = document.WithSyntaxRoot(syntaxRoot);
+        semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+        if (semanticModel != null)
+        {
+            // Check if this file has a corresponding XAML file (code-behind pattern)
+            var isCodeBehind = document.FilePath?.EndsWith(".xaml.cs", StringComparison.OrdinalIgnoreCase) == true ||
+                              document.FilePath?.EndsWith(".axaml.cs", StringComparison.OrdinalIgnoreCase) == true;
+
+            if (isCodeBehind)
+            {
+                var codeBehindRewriter = new CodeBehindRewriter(
+                    semanticModel,
+                    context.Diagnostics,
+                    context.MappingRepository);
+
+                // If context has named elements from XAML parsing, pass them to the rewriter
+                var namedElements = context.State.TryGetValue("NamedElements", out var namedElementsObj)
+                    ? namedElementsObj as Dictionary<string, string>
+                    : null;
+                if (namedElements != null)
+                {
+                    foreach (var element in namedElements)
+                    {
+                        codeBehindRewriter.AddNamedElement(element.Key, element.Value);
+                    }
+                }
+
+                syntaxRoot = codeBehindRewriter.Visit(syntaxRoot);
+            }
+        }
+
+        // Apply value converter transformation (Task 2.5.7.1.3)
+        document = document.WithSyntaxRoot(syntaxRoot);
+        semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+        if (semanticModel != null)
+        {
+            var valueConverterRewriter = new ValueConverterRewriter(
+                semanticModel,
+                context.Diagnostics,
+                context.MappingRepository);
+
+            syntaxRoot = valueConverterRewriter.Visit(syntaxRoot);
+        }
+
+        // Apply validation rule transformation (Task 2.5.7.1.5)
+        document = document.WithSyntaxRoot(syntaxRoot);
+        semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+        if (semanticModel != null)
+        {
+            var validationRuleRewriter = new ValidationRuleRewriter(
+                semanticModel,
+                context.Diagnostics,
+                context.MappingRepository);
+
+            syntaxRoot = validationRuleRewriter.Visit(syntaxRoot);
+        }
+
+        // Apply command transformation (Task 2.5.7.3)
+        document = document.WithSyntaxRoot(syntaxRoot);
+        semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+        if (semanticModel != null)
+        {
+            var commandRewriter = new CommandRewriter(
+                semanticModel,
+                context.Diagnostics,
+                context.MappingRepository);
+
+            syntaxRoot = commandRewriter.Visit(syntaxRoot);
+        }
+
         // Format the document if configured
         if (context.Configuration.PreserveFormatting)
         {

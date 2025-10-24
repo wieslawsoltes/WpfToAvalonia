@@ -9,6 +9,7 @@ namespace WpfToAvalonia.XamlParser.Coordination;
 /// <summary>
 /// Coordinates XAML transformations with C# code-behind transformations.
 /// Ensures consistency between XAML and code-behind during WPF to Avalonia migration.
+/// Implements task 2.5.6.2: Code-behind integration
 /// </summary>
 public sealed class CodeBehindCoordinator
 {
@@ -20,6 +21,56 @@ public sealed class CodeBehindCoordinator
     public CodeBehindCoordinator(DiagnosticCollector diagnostics)
     {
         _diagnostics = diagnostics ?? throw new ArgumentNullException(nameof(diagnostics));
+    }
+
+    /// <summary>
+    /// Task 2.5.6.2.1: Extracts x:Class and x:Name mappings from XAML document.
+    /// </summary>
+    /// <param name="xamlDocument">The XAML document to extract mappings from</param>
+    /// <returns>Dictionary mapping x:Name values to element type names</returns>
+    public Dictionary<string, string> ExtractNamedElementMappings(UnifiedXamlDocument xamlDocument)
+    {
+        var mappings = new Dictionary<string, string>();
+
+        if (xamlDocument.Root == null)
+        {
+            return mappings;
+        }
+
+        // Extract x:Class
+        var xClass = xamlDocument.Root.GetProperty("x:Class")?.Value as string;
+        if (!string.IsNullOrEmpty(xClass))
+        {
+            _diagnostics.AddInfo(
+                "COORDINATOR_XCLASS_EXTRACTED",
+                $"Extracted x:Class: {xClass}",
+                xamlDocument.FilePath);
+        }
+
+        // Extract all x:Name attributes
+        foreach (var element in xamlDocument.Root.DescendantsAndSelf())
+        {
+            var xName = element.XName;
+            if (!string.IsNullOrEmpty(xName) && element.ElementType != null)
+            {
+                var typeName = element.ElementType.FullName;
+                mappings[xName] = typeName;
+
+                _diagnostics.AddInfo(
+                    "COORDINATOR_XNAME_EXTRACTED",
+                    $"Extracted x:Name='{xName}' with type '{typeName}'",
+                    element.Location.FilePath,
+                    element.Location.Line,
+                    element.Location.Column);
+            }
+        }
+
+        _diagnostics.AddInfo(
+            "COORDINATOR_EXTRACTION_COMPLETE",
+            $"Extracted {mappings.Count} named elements from XAML",
+            xamlDocument.FilePath);
+
+        return mappings;
     }
 
     /// <summary>
