@@ -156,6 +156,110 @@ public sealed class CSharpFileTransformer : ITransformer
             syntaxRoot = dpRewriter.Visit(syntaxRoot);
         }
 
+        // Apply resource access transformation (Task 2.5.1)
+        document = document.WithSyntaxRoot(syntaxRoot);
+        semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+        if (semanticModel != null)
+        {
+            var resourceRewriter = new ResourceAccessRewriter(
+                semanticModel,
+                context.Diagnostics,
+                context.MappingRepository);
+
+            syntaxRoot = resourceRewriter.Visit(syntaxRoot);
+        }
+
+        // Apply FrameworkElementFactory transformation (Task 2.5.2.1)
+        document = document.WithSyntaxRoot(syntaxRoot);
+        semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+        if (semanticModel != null)
+        {
+            var frameworkElementFactoryRewriter = new FrameworkElementFactoryRewriter(
+                semanticModel,
+                context.Diagnostics,
+                context.MappingRepository);
+
+            syntaxRoot = frameworkElementFactoryRewriter.Visit(syntaxRoot);
+        }
+
+        // Apply template part attribute transformation (Task 2.5.2.2)
+        document = document.WithSyntaxRoot(syntaxRoot);
+        semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+        if (semanticModel != null)
+        {
+            var templatePartRewriter = new TemplatePartAttributeRewriter(
+                semanticModel,
+                context.Diagnostics,
+                context.MappingRepository);
+
+            syntaxRoot = templatePartRewriter.Visit(syntaxRoot);
+        }
+
+        // Apply Visual State Manager transformation (Task 2.5.2.3)
+        document = document.WithSyntaxRoot(syntaxRoot);
+        semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+        if (semanticModel != null)
+        {
+            var vsmRewriter = new VisualStateManagerRewriter(
+                semanticModel,
+                context.Diagnostics,
+                context.MappingRepository);
+
+            syntaxRoot = vsmRewriter.Visit(syntaxRoot);
+        }
+
+        // Apply coercion callback transformation (Task 2.5.3.1)
+        document = document.WithSyntaxRoot(syntaxRoot);
+        semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+        if (semanticModel != null)
+        {
+            var coercionRewriter = new CoercionCallbackRewriter(
+                semanticModel,
+                context.Diagnostics,
+                context.MappingRepository);
+
+            syntaxRoot = coercionRewriter.Visit(syntaxRoot);
+        }
+
+        // Apply Freezable transformation (Task 2.5.3.2)
+        document = document.WithSyntaxRoot(syntaxRoot);
+        semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+        if (semanticModel != null)
+        {
+            var freezableRewriter = new FreezableRewriter(
+                semanticModel,
+                context.Diagnostics,
+                context.MappingRepository);
+
+            syntaxRoot = freezableRewriter.Visit(syntaxRoot);
+        }
+
+        // Apply threading model transformation (Task 2.5.3.3)
+        document = document.WithSyntaxRoot(syntaxRoot);
+        semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+        if (semanticModel != null)
+        {
+            var threadingRewriter = new ThreadingModelRewriter(
+                semanticModel,
+                context.Diagnostics,
+                context.MappingRepository);
+
+            syntaxRoot = threadingRewriter.Visit(syntaxRoot);
+        }
+
+        // Apply WPF attribute transformation (Task 2.5.3.4)
+        document = document.WithSyntaxRoot(syntaxRoot);
+        semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+        if (semanticModel != null)
+        {
+            var attributeRewriter = new WpfAttributeRewriter(
+                semanticModel,
+                context.Diagnostics,
+                context.MappingRepository);
+
+            syntaxRoot = attributeRewriter.Visit(syntaxRoot);
+        }
+
         // Format the document if configured
         if (context.Configuration.PreserveFormatting)
         {
