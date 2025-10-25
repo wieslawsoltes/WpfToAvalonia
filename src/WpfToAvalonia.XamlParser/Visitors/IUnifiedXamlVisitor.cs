@@ -27,6 +27,11 @@ public interface IUnifiedXamlVisitor
     /// Visits a markup extension.
     /// </summary>
     void VisitMarkupExtension(UnifiedXamlMarkupExtension markupExtension);
+
+    /// <summary>
+    /// Visits a comment.
+    /// </summary>
+    void VisitComment(UnifiedXamlComment comment);
 }
 
 /// <summary>
@@ -81,4 +86,9 @@ public interface IUnifiedXamlVisitor<T>
     /// Visits a markup extension and returns a result.
     /// </summary>
     T VisitMarkupExtension(UnifiedXamlMarkupExtension markupExtension);
+
+    /// <summary>
+    /// Visits a comment and returns a result.
+    /// </summary>
+    T VisitComment(UnifiedXamlComment comment);
 }

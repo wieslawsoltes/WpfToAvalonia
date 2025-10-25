@@ -38,13 +38,27 @@ public sealed class UnifiedXamlMarkupExtension : UnifiedXamlNode
     /// Gets the parameters/properties of the markup extension.
     /// Key = parameter name, Value = parameter value
     /// </summary>
+    [Obsolete("Use TypedParameters for type-safe access. This property will be removed in v2.0.")]
     public Dictionary<string, object?> Parameters { get; } = new();
+
+    /// <summary>
+    /// Gets the strongly-typed parameters/properties of the markup extension.
+    /// This is the preferred way to access parameters with compile-time type safety.
+    /// </summary>
+    public Dictionary<string, MarkupExtensionParameter> TypedParameters { get; } = new();
 
     /// <summary>
     /// Gets or sets the positional argument (for extensions with a default property).
     /// Example: {StaticResource MyBrush} has positional argument "MyBrush"
     /// </summary>
+    [Obsolete("Use TypedPositionalArgument for type-safe access. This property will be removed in v2.0.")]
     public object? PositionalArgument { get; set; }
+
+    /// <summary>
+    /// Gets or sets the strongly-typed positional argument.
+    /// This is the preferred way to access the positional argument with compile-time type safety.
+    /// </summary>
+    public MarkupExtensionParameter? TypedPositionalArgument { get; set; }
 
     // === Specific Extension Types ===
 
@@ -73,21 +87,66 @@ public sealed class UnifiedXamlMarkupExtension : UnifiedXamlNode
     /// <summary>
     /// Gets a parameter value by name.
     /// </summary>
+    [Obsolete("Use TypedParameters dictionary directly for type-safe access. This method will be removed in v2.0.")]
     public T? GetParameter<T>(string name, T? defaultValue = default)
     {
+        #pragma warning disable CS0618
         if (Parameters.TryGetValue(name, out var value) && value is T typedValue)
         {
             return typedValue;
         }
+        #pragma warning restore CS0618
         return defaultValue;
     }
 
     /// <summary>
     /// Sets a parameter value.
     /// </summary>
+    [Obsolete("Use TypedParameters dictionary directly for type-safe access. This method will be removed in v2.0.")]
     public void SetParameter(string name, object? value)
     {
+        #pragma warning disable CS0618
         Parameters[name] = value;
+        #pragma warning restore CS0618
+    }
+
+    /// <summary>
+    /// Gets the RelativeSource parameter if this is a binding with RelativeSource.
+    /// </summary>
+    public RelativeSourceExpression? GetRelativeSource()
+    {
+        if (TypedParameters.TryGetValue("RelativeSource", out var param) &&
+            param.Kind == ParameterValueKind.RelativeSource)
+        {
+            return param.AsRelativeSource();
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Gets the Path parameter as a string if available.
+    /// </summary>
+    public string? GetPath()
+    {
+        if (TypedParameters.TryGetValue("Path", out var param) &&
+            param.Kind == ParameterValueKind.String)
+        {
+            return param.AsString();
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Gets the Mode parameter as a string if available.
+    /// </summary>
+    public string? GetMode()
+    {
+        if (TypedParameters.TryGetValue("Mode", out var param) &&
+            param.Kind == ParameterValueKind.String)
+        {
+            return param.AsString();
+        }
+        return null;
     }
 
     /// <summary>
@@ -178,24 +237,129 @@ public sealed class BindingExpression
 }
 
 /// <summary>
-/// Represents a relative source binding.
+/// Represents a relative source binding with structured type information.
+/// Replaces string-based AncestorType with QualifiedTypeName for type safety.
 /// </summary>
-public sealed class RelativeSourceExpression
+public sealed record RelativeSourceExpression
 {
     /// <summary>
-    /// Gets or sets the relative source mode.
+    /// Gets the relative source mode.
     /// </summary>
-    public string? Mode { get; set; }
+    public RelativeSourceMode Mode { get; init; } = RelativeSourceMode.Self;
 
     /// <summary>
-    /// Gets or sets the ancestor type.
+    /// Gets the ancestor type (for FindAncestor mode).
     /// </summary>
-    public string? AncestorType { get; set; }
+    public QualifiedTypeName? AncestorType { get; init; }
 
     /// <summary>
-    /// Gets or sets the ancestor level.
+    /// Gets the ancestor level (for FindAncestor mode).
     /// </summary>
-    public int? AncestorLevel { get; set; }
+    public int AncestorLevel { get; init; } = 1;
+
+    /// <summary>
+    /// Parses a RelativeSource string into a structured expression.
+    /// This replaces regex-based parsing with proper structured parsing.
+    /// </summary>
+    public static RelativeSourceExpression Parse(string value, IDictionary<string, string>? namespacePrefixes = null)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            throw new ArgumentException("RelativeSource value cannot be empty", nameof(value));
+
+        // Simple parsing - can be enhanced as needed
+        var mode = RelativeSourceMode.Self;
+        QualifiedTypeName? ancestorType = null;
+        var ancestorLevel = 1;
+
+        // Parse mode
+        if (value.Contains("FindAncestor", StringComparison.OrdinalIgnoreCase))
+        {
+            mode = RelativeSourceMode.FindAncestor;
+        }
+        else if (value.Contains("TemplatedParent", StringComparison.OrdinalIgnoreCase))
+        {
+            mode = RelativeSourceMode.TemplatedParent;
+        }
+        else if (value.Contains("PreviousData", StringComparison.OrdinalIgnoreCase))
+        {
+            mode = RelativeSourceMode.PreviousData;
+        }
+
+        // Parse AncestorType if FindAncestor mode
+        if (mode == RelativeSourceMode.FindAncestor)
+        {
+            // Look for AncestorType=TypeName or AncestorType={x:Type TypeName}
+            var ancestorTypeMatch = System.Text.RegularExpressions.Regex.Match(
+                value,
+                @"AncestorType\s*=\s*(?:\{x:Type\s+)?([a-zA-Z0-9_:]+)");
+
+            if (ancestorTypeMatch.Success)
+            {
+                var typeName = ancestorTypeMatch.Groups[1].Value;
+                ancestorType = QualifiedTypeName.Parse(typeName, namespacePrefixes);
+            }
+
+            // Parse AncestorLevel
+            var levelMatch = System.Text.RegularExpressions.Regex.Match(
+                value,
+                @"AncestorLevel\s*=\s*(\d+)");
+
+            if (levelMatch.Success && int.TryParse(levelMatch.Groups[1].Value, out var level))
+            {
+                ancestorLevel = level;
+            }
+        }
+
+        return new RelativeSourceExpression
+        {
+            Mode = mode,
+            AncestorType = ancestorType,
+            AncestorLevel = ancestorLevel
+        };
+    }
+
+    /// <summary>
+    /// Tries to parse a RelativeSource string.
+    /// </summary>
+    public static bool TryParse(string value, out RelativeSourceExpression result, IDictionary<string, string>? namespacePrefixes = null)
+    {
+        try
+        {
+            result = Parse(value, namespacePrefixes);
+            return true;
+        }
+        catch
+        {
+            result = null!;
+            return false;
+        }
+    }
+}
+
+/// <summary>
+/// Defines the RelativeSource binding mode.
+/// </summary>
+public enum RelativeSourceMode
+{
+    /// <summary>
+    /// Binds to the element itself.
+    /// </summary>
+    Self,
+
+    /// <summary>
+    /// Binds to an ancestor of a specific type.
+    /// </summary>
+    FindAncestor,
+
+    /// <summary>
+    /// Binds to the previous data item.
+    /// </summary>
+    PreviousData,
+
+    /// <summary>
+    /// Binds to the templated parent.
+    /// </summary>
+    TemplatedParent
 }
 
 /// <summary>

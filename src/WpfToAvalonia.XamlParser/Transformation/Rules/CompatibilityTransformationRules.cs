@@ -76,8 +76,10 @@ public sealed class TriggerToStyleSelectorTransformer : ElementTransformationRul
         // Create a new Style element with selector and store it in metadata
         var newStyle = new UnifiedXamlElement
         {
+            #pragma warning disable CS0618
             TypeName = "Style",
-            XmlElement = element.XmlElement,
+            #pragma warning restore CS0618
+            SourceXmlElement = element.SourceXmlElement,
             XmlNode = element.XmlNode,
             Location = element.Location,
             Formatting = element.Formatting
@@ -194,8 +196,10 @@ public sealed class TriggerToStyleSelectorTransformer : ElementTransformationRul
     {
         var clone = new UnifiedXamlElement
         {
+            #pragma warning disable CS0618
             TypeName = source.TypeName,
-            XmlElement = source.XmlElement,
+            #pragma warning restore CS0618
+            SourceXmlElement = source.SourceXmlElement,
             XmlNode = source.XmlNode,
             Location = source.Location,
             Formatting = source.Formatting,
@@ -853,9 +857,11 @@ public sealed class StyleTriggersRestructuringRule : ElementTransformationRuleBa
         // Create a collection element to hold all styles
         var collectionElement = new UnifiedXamlElement
         {
+            #pragma warning disable CS0618
             TypeName = $"{ownerElement.TypeName}.Resources",
+            #pragma warning restore CS0618
             Parent = ownerElement,
-            XmlElement = originalStyle.XmlElement,
+            SourceXmlElement = originalStyle.SourceXmlElement,
             XmlNode = originalStyle.XmlNode,
             Location = originalStyle.Location,
             Formatting = originalStyle.Formatting

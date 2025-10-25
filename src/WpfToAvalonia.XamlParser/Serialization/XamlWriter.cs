@@ -197,7 +197,12 @@ public sealed class XamlWriter
 
         foreach (var property in attributes)
         {
-            if (_options.AttributesOnSeparateLines)
+            // Use preserved formatting if available, otherwise fall back to options
+            if (_options.PreserveFormatting && property.Formatting.LeadingWhitespace != null)
+            {
+                _output.Append(property.Formatting.LeadingWhitespace);
+            }
+            else if (_options.AttributesOnSeparateLines)
             {
                 _output.Append(_options.NewLine);
                 WriteIndent();

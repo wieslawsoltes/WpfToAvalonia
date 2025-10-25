@@ -22,13 +22,24 @@ public interface IEnricher
 public sealed class TypeResolutionEnricher : UnifiedXamlVisitorBase, IEnricher
 {
     private readonly IXamlTypeResolver _typeResolver;
+    private readonly TypeResolutionOptions _options;
+    private readonly List<UnresolvedTypeInfo> _unresolvedTypes = new();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="TypeResolutionEnricher"/> class.
+    /// Initializes a new instance of the <see cref="TypeResolutionEnricher"/> class with default options.
     /// </summary>
     public TypeResolutionEnricher(IXamlTypeResolver typeResolver)
+        : this(typeResolver, TypeResolutionOptions.Default())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TypeResolutionEnricher"/> class with custom options.
+    /// </summary>
+    public TypeResolutionEnricher(IXamlTypeResolver typeResolver, TypeResolutionOptions options)
     {
         _typeResolver = typeResolver ?? throw new ArgumentNullException(nameof(typeResolver));
+        _options = options ?? throw new ArgumentNullException(nameof(options));
     }
 
     /// <summary>
@@ -41,8 +52,17 @@ public sealed class TypeResolutionEnricher : UnifiedXamlVisitorBase, IEnricher
             return;
         }
 
+        // Clear any previous unresolved types
+        _unresolvedTypes.Clear();
+
         // Visit the tree and resolve types
         VisitDocument(document);
+
+        // Check if we have unresolved types and policy requires resolution
+        if (_unresolvedTypes.Count > 0 && _options.Policy == TypeResolutionPolicy.Required)
+        {
+            throw new TypeResolutionException(_unresolvedTypes);
+        }
     }
 
     /// <summary>
@@ -51,28 +71,65 @@ public sealed class TypeResolutionEnricher : UnifiedXamlVisitorBase, IEnricher
     public override void VisitElement(UnifiedXamlElement element)
     {
         // Resolve element type
-        if (element.ResolvedType == null)
+        if (element.ResolvedType == null && element.ElementType == null)
         {
+            #pragma warning disable CS0618 // TypeName/Namespace are obsolete but needed for backward compat
             var xmlNs = element.XmlNamespace?.NamespaceName ?? element.Namespace ?? string.Empty;
-            var resolvedType = _typeResolver.ResolveType(xmlNs, element.TypeName);
+            var typeName = element.TypeReference?.FullName ?? element.TypeName;
+            #pragma warning restore CS0618
+
+            var resolvedType = _typeResolver.ResolveType(xmlNs, typeName);
 
             if (resolvedType != null)
             {
                 element.ResolvedType = resolvedType;
+                element.ElementType = resolvedType;
                 element.State = TransformationState.Analyzed;
+
+                // Update TypeReference if present
+                if (element.TypeReference != null)
+                {
+                    element.TypeReference = element.TypeReference.WithResolvedType(resolvedType);
+                }
             }
             else
             {
-                element.State = TransformationState.Failed;
-                element.AddDiagnostic(
-                    "TYPE_NOT_FOUND",
-                    $"Could not resolve type '{element.TypeName}' in namespace '{xmlNs}'",
-                    Core.Diagnostics.DiagnosticSeverity.Warning);
+                // Type resolution failed
+                HandleUnresolvedType(element, typeName, xmlNs);
+
+                // If fail-fast is enabled and policy is Required, throw immediately
+                if (_options.Policy == TypeResolutionPolicy.Required && _options.FailFast)
+                {
+                    throw new TypeResolutionException($"Cannot resolve type: {typeName}", element);
+                }
             }
         }
 
         // Continue visiting children
         base.VisitElement(element);
+    }
+
+    private void HandleUnresolvedType(UnifiedXamlElement element, string typeName, string xmlNs)
+    {
+        element.State = TransformationState.Failed;
+
+        var severity = _options.Policy == TypeResolutionPolicy.Required
+            ? Core.Diagnostics.DiagnosticSeverity.Error
+            : Core.Diagnostics.DiagnosticSeverity.Warning;
+
+        element.AddDiagnostic(
+            "TYPE_NOT_FOUND",
+            $"Could not resolve type '{typeName}' in namespace '{xmlNs}'",
+            severity);
+
+        // Track unresolved type for batch reporting
+        _unresolvedTypes.Add(new UnresolvedTypeInfo
+        {
+            TypeName = typeName,
+            Location = element.Location,
+            Element = element,
+            Namespace = xmlNs
+        });
     }
 
     /// <summary>

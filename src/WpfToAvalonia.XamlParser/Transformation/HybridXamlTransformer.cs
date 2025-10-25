@@ -169,7 +169,7 @@ public abstract class HybridXamlTransformer
         foreach (var element in document.Root.DescendantsAndSelf())
         {
             // Check if element has required layers
-            if (element.XmlElement == null && Mode != TransformationMode.SemanticOnly)
+            if (element.SourceXmlElement == null && Mode != TransformationMode.SemanticOnly)
             {
                 Diagnostics.AddWarning(
                     "VALIDATION_MISSING_XML",

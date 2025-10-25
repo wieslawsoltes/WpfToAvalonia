@@ -97,6 +97,9 @@ public class WhitespacePreservationTest
         _output.WriteLine($"Leading: '{result.Document.Root!.Formatting.LeadingWhitespace}'");
         _output.WriteLine($"Trailing: '{result.Document.Root.Formatting.TrailingWhitespace}'");
         _output.WriteLine($"Inner: '{result.Document.Root.Formatting.InnerWhitespace}'");
+        _output.WriteLine($"SourceStartPosition: {result.Document.Root.Formatting.SourceStartPosition}");
+        _output.WriteLine($"LineNumber: {result.Document.Root.Formatting.LineNumber}");
+        _output.WriteLine($"ColumnNumber: {result.Document.Root.Formatting.ColumnNumber}");
 
         if (result.Document.Root.Children.Count > 0)
         {

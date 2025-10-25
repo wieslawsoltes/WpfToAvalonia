@@ -56,4 +56,29 @@ public sealed class FormattingHints
     /// Gets or sets the indentation string (tabs or spaces).
     /// </summary>
     public string IndentString { get; set; } = "    "; // Default: 4 spaces
+
+    /// <summary>
+    /// Gets or sets the original source XAML string (for position-based whitespace extraction).
+    /// </summary>
+    public string? SourceXaml { get; set; }
+
+    /// <summary>
+    /// Gets or sets the start position of this node in the source XAML.
+    /// </summary>
+    public int SourceStartPosition { get; set; }
+
+    /// <summary>
+    /// Gets or sets the end position of this node in the source XAML.
+    /// </summary>
+    public int SourceEndPosition { get; set; }
+
+    /// <summary>
+    /// Gets or sets the line number where this node starts (1-based).
+    /// </summary>
+    public int LineNumber { get; set; }
+
+    /// <summary>
+    /// Gets or sets the column number where this node starts (1-based).
+    /// </summary>
+    public int ColumnNumber { get; set; }
 }

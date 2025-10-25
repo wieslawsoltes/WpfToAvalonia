@@ -23,9 +23,21 @@ public abstract class UnifiedXamlVisitorBase : IUnifiedXamlVisitor
     /// </summary>
     public virtual void VisitDocument(UnifiedXamlDocument document)
     {
+        // Visit leading comments
+        foreach (var comment in document.LeadingComments)
+        {
+            VisitComment(comment);
+        }
+
         if (document.Root != null)
         {
             VisitElement(document.Root);
+        }
+
+        // Visit trailing comments
+        foreach (var comment in document.TrailingComments)
+        {
+            VisitComment(comment);
         }
     }
 
@@ -41,6 +53,12 @@ public abstract class UnifiedXamlVisitorBase : IUnifiedXamlVisitor
             {
                 VisitProperty(property);
             }
+        }
+
+        // Visit comments associated with this element
+        foreach (var comment in element.Comments)
+        {
+            VisitComment(comment);
         }
 
         // Then visit children
@@ -84,6 +102,15 @@ public abstract class UnifiedXamlVisitorBase : IUnifiedXamlVisitor
                 VisitMarkupExtension(nestedExtension);
             }
         }
+    }
+
+    /// <summary>
+    /// Visits a comment.
+    /// </summary>
+    public virtual void VisitComment(UnifiedXamlComment comment)
+    {
+        // Default implementation does nothing
+        // Override in derived classes to process comments
     }
 }
 
@@ -379,9 +406,21 @@ public abstract class UnifiedXamlCollectorVisitor<T> : IUnifiedXamlVisitor<List<
     {
         Results.Clear();
 
+        // Visit leading comments
+        foreach (var comment in document.LeadingComments)
+        {
+            VisitComment(comment);
+        }
+
         if (document.Root != null)
         {
             VisitElement(document.Root);
+        }
+
+        // Visit trailing comments
+        foreach (var comment in document.TrailingComments)
+        {
+            VisitComment(comment);
         }
 
         return Results;
@@ -396,6 +435,12 @@ public abstract class UnifiedXamlCollectorVisitor<T> : IUnifiedXamlVisitor<List<
         foreach (var property in element.Properties)
         {
             VisitProperty(property);
+        }
+
+        // Visit comments associated with this element
+        foreach (var comment in element.Comments)
+        {
+            VisitComment(comment);
         }
 
         // Visit children
@@ -441,6 +486,16 @@ public abstract class UnifiedXamlCollectorVisitor<T> : IUnifiedXamlVisitor<List<
             }
         }
 
+        return Results;
+    }
+
+    /// <summary>
+    /// Visits a comment and collects results.
+    /// </summary>
+    public virtual List<T> VisitComment(UnifiedXamlComment comment)
+    {
+        // Default implementation does nothing
+        // Override in derived classes to collect comments
         return Results;
     }
 }

@@ -60,7 +60,7 @@ public sealed class UnifiedXamlParser
 
             // Stage 2: Convert to Unified AST
             var converter = new XmlToUnifiedConverter(_diagnostics);
-            var document = converter.Convert(xDocument, filePath);
+            var document = converter.Convert(xDocument, filePath, xamlContent);
 
             return document;
         }

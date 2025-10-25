@@ -47,6 +47,18 @@ public sealed class UnifiedAstSerializer
             xDocument.Declaration = new XDeclaration("1.0", document.Encoding, null);
         }
 
+        // Add leading comments (before root element)
+        if (_options.PreserveComments)
+        {
+            foreach (var comment in document.LeadingComments)
+            {
+                if (comment.Preserve)
+                {
+                    xDocument.Add(new XComment(comment.Text));
+                }
+            }
+        }
+
         // Serialize root element
         if (document.Root != null)
         {
@@ -57,6 +69,18 @@ public sealed class UnifiedAstSerializer
             if (_options.IncludeDiagnosticComments)
             {
                 AddDiagnosticComments(document, xDocument);
+            }
+        }
+
+        // Add trailing comments (after root element)
+        if (_options.PreserveComments)
+        {
+            foreach (var comment in document.TrailingComments)
+            {
+                if (comment.Preserve)
+                {
+                    xDocument.Add(new XComment(comment.Text));
+                }
             }
         }
 
@@ -90,9 +114,9 @@ public sealed class UnifiedAstSerializer
         SerializeChildren(element, xElement);
 
         // Preserve whitespace if configured
-        if (_options.PreserveWhitespace && element.XmlElement != null)
+        if (_options.PreserveWhitespace && element.SourceXmlElement != null)
         {
-            PreserveWhitespace(element.XmlElement, xElement);
+            PreserveWhitespace(element.SourceXmlElement, xElement);
         }
 
         return xElement;
@@ -121,10 +145,10 @@ public sealed class UnifiedAstSerializer
         }
 
         // Use original XML element's name if available and preserving original
-        if (element.XmlElement != null && !_options.UseAvaloniaNamespaces)
+        if (element.SourceXmlElement != null && !_options.UseAvaloniaNamespaces)
         {
             // Preserve the namespace from original XML
-            return element.XmlElement.Name;
+            return element.SourceXmlElement.Name;
         }
 
         // Fallback to type name with element's namespace or no namespace
@@ -147,10 +171,10 @@ public sealed class UnifiedAstSerializer
             xElement.Add(new XAttribute("xmlns", "https://github.com/avaloniaui"));
             xElement.Add(new XAttribute(XNamespace.Xmlns + "x", "http://schemas.microsoft.com/winfx/2006/xaml"));
         }
-        else if (element.XmlElement != null)
+        else if (element.SourceXmlElement != null)
         {
             // Preserve original namespaces
-            foreach (var attr in element.XmlElement.Attributes())
+            foreach (var attr in element.SourceXmlElement.Attributes())
             {
                 if (attr.IsNamespaceDeclaration)
                 {
@@ -246,6 +270,20 @@ public sealed class UnifiedAstSerializer
         {
             var childElement = SerializeElement(child);
             xElement.Add(childElement);
+        }
+
+        // Serialize comments associated with this element (at the end of content)
+        // Comments from the source XML are typically between child elements,
+        // so we add them after children for proper positioning
+        if (_options.PreserveComments && element.Comments.Count > 0)
+        {
+            foreach (var comment in element.Comments)
+            {
+                if (comment.Preserve)
+                {
+                    xElement.Add(new XComment(comment.Text));
+                }
+            }
         }
 
         // Add text content if present
@@ -403,6 +441,11 @@ public sealed class SerializationOptions
     /// Gets or sets a value indicating whether to preserve whitespace from original XML.
     /// </summary>
     public bool PreserveWhitespace { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to preserve comments from original XML.
+    /// </summary>
+    public bool PreserveComments { get; set; } = true;
 
     /// <summary>
     /// Gets or sets a value indicating whether to include diagnostic comments in output.

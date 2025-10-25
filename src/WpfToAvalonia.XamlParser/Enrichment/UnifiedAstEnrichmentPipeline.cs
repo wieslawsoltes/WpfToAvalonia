@@ -304,7 +304,7 @@ public sealed class UnifiedAstEnrichmentPipeline
         foreach (var element in document.Root.DescendantsAndSelf())
         {
             // Check if element has both XML and semantic info
-            if (element.XmlElement != null && element.SemanticObject == null)
+            if (element.SourceXmlElement != null && element.SemanticObject == null)
             {
                 _diagnostics.AddWarning(
                     "ENRICHMENT_INCOMPLETE",
@@ -316,9 +316,9 @@ public sealed class UnifiedAstEnrichmentPipeline
             }
 
             // Validate type name consistency
-            if (element.XmlElement != null && element.ElementType != null)
+            if (element.SourceXmlElement != null && element.ElementType != null)
             {
-                var xmlTypeName = element.XmlElement.Name.LocalName;
+                var xmlTypeName = element.SourceXmlElement.Name.LocalName;
                 var semanticTypeName = element.ElementType.Name;
 
                 if (xmlTypeName != semanticTypeName)

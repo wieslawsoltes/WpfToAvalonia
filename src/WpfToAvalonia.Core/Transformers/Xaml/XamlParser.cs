@@ -97,7 +97,7 @@ public sealed class XamlParser
             };
 
             using var reader = XmlReader.Create(new StringReader(xaml), settings);
-            var document = XDocument.Load(reader, LoadOptions.PreserveWhitespace);
+            var document = XDocument.Load(reader, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
             return document;
         }
         catch (XmlException ex)

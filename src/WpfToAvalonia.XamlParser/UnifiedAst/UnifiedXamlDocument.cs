@@ -69,6 +69,16 @@ public sealed class UnifiedXamlDocument
     /// </summary>
     public UnifiedXamlElement? Root { get; set; }
 
+    /// <summary>
+    /// Gets the comments that appear before the root element (e.g., file-level documentation).
+    /// </summary>
+    public List<UnifiedXamlComment> LeadingComments { get; } = new();
+
+    /// <summary>
+    /// Gets the comments that appear after the root element.
+    /// </summary>
+    public List<UnifiedXamlComment> TrailingComments { get; } = new();
+
     // === XML Layer ===
 
     /// <summary>

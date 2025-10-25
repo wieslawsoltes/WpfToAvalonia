@@ -51,7 +51,14 @@ public sealed class UnifiedXamlProperty : UnifiedXamlNode
     /// Gets or sets the property value.
     /// Can be a string, UnifiedXamlElement, UnifiedXamlMarkupExtension, or other value.
     /// </summary>
+    [Obsolete("Use ValueTyped for type-safe access. This property will be removed in v2.0.")]
     public object? Value { get; set; }
+
+    /// <summary>
+    /// Gets or sets the strongly-typed property value.
+    /// This is the preferred way to access property values with compile-time type safety.
+    /// </summary>
+    public PropertyValue? ValueTyped { get; set; }
 
     /// <summary>
     /// Gets or sets the kind of property.

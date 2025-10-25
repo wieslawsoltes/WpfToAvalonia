@@ -1,6 +1,7 @@
 using System.Xml;
 using System.Xml.Linq;
 using WpfToAvalonia.Core.Diagnostics;
+using WpfToAvalonia.XamlParser.Formatting;
 using WpfToAvalonia.XamlParser.UnifiedAst;
 
 namespace WpfToAvalonia.XamlParser.Converters;
@@ -12,6 +13,8 @@ namespace WpfToAvalonia.XamlParser.Converters;
 public sealed class XmlToUnifiedConverter
 {
     private readonly DiagnosticCollector _diagnostics;
+    private string? _sourceXaml;
+    private SourceBasedWhitespaceExtractor? _whitespaceExtractor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlToUnifiedConverter"/> class.
@@ -24,8 +27,16 @@ public sealed class XmlToUnifiedConverter
     /// <summary>
     /// Converts an XDocument to a UnifiedXamlDocument.
     /// </summary>
-    public UnifiedXamlDocument Convert(XDocument xDocument, string? filePath = null)
+    public UnifiedXamlDocument Convert(XDocument xDocument, string? filePath = null, string? sourceXaml = null)
     {
+        _sourceXaml = sourceXaml;
+
+        // Initialize source-based whitespace extractor if source is available
+        if (!string.IsNullOrEmpty(sourceXaml))
+        {
+            _whitespaceExtractor = new SourceBasedWhitespaceExtractor(sourceXaml);
+        }
+
         var document = new UnifiedXamlDocument
         {
             XmlDocument = xDocument,
@@ -35,6 +46,23 @@ public sealed class XmlToUnifiedConverter
             Encoding = xDocument.Declaration?.Encoding ?? "UTF-8"
         };
 
+        // Extract leading comments (before root element)
+        if (xDocument.Root != null)
+        {
+            foreach (var node in xDocument.Nodes())
+            {
+                if (node == xDocument.Root)
+                    break;
+
+                if (node is XComment commentNode)
+                {
+                    var comment = ConvertComment(commentNode, null);
+                    comment.Position = CommentPosition.BeforeElement;
+                    document.LeadingComments.Add(comment);
+                }
+            }
+        }
+
         // Convert root element
         if (xDocument.Root != null)
         {
@@ -42,6 +70,27 @@ public sealed class XmlToUnifiedConverter
 
             // Populate symbol table
             PopulateSymbolTable(document);
+        }
+
+        // Extract trailing comments (after root element)
+        if (xDocument.Root != null)
+        {
+            bool foundRoot = false;
+            foreach (var node in xDocument.Nodes())
+            {
+                if (node == xDocument.Root)
+                {
+                    foundRoot = true;
+                    continue;
+                }
+
+                if (foundRoot && node is XComment commentNode)
+                {
+                    var comment = ConvertComment(commentNode, null);
+                    comment.Position = CommentPosition.AfterElement;
+                    document.TrailingComments.Add(comment);
+                }
+            }
         }
 
         return document;
@@ -54,7 +103,7 @@ public sealed class XmlToUnifiedConverter
     {
         var element = new UnifiedXamlElement
         {
-            XmlElement = xElement,
+            SourceXmlElement = xElement,
             XmlNode = xElement,
             XmlNamespace = xElement.Name.Namespace,
             Parent = parent,
@@ -63,8 +112,15 @@ public sealed class XmlToUnifiedConverter
 
         // Parse type name and namespace
         ParseTypeName(xElement.Name, out var typeName, out var typeNamespace);
+
+        // Set legacy properties for backwards compatibility
+        #pragma warning disable CS0618 // Type or member is obsolete
         element.TypeName = typeName;
         element.Namespace = typeNamespace;
+        #pragma warning restore CS0618
+
+        // Create strongly-typed TypeReference
+        element.TypeReference = new QualifiedTypeName(typeName, typeNamespace);
 
         // Extract source location
         element.Location = ExtractLocation(xElement);
@@ -113,6 +169,13 @@ public sealed class XmlToUnifiedConverter
             }
         }
 
+        // Extract comments from child nodes
+        foreach (var commentNode in xElement.Nodes().OfType<XComment>())
+        {
+            var comment = ConvertComment(commentNode, element);
+            element.Comments.Add(comment);
+        }
+
         // Handle text content
         if (xElement.Nodes().Any(n => n is XText))
         {
@@ -120,6 +183,54 @@ public sealed class XmlToUnifiedConverter
         }
 
         return element;
+    }
+
+    /// <summary>
+    /// Converts an XComment to a UnifiedXamlComment.
+    /// </summary>
+    private UnifiedXamlComment ConvertComment(XComment xComment, UnifiedXamlNode? parent)
+    {
+        var comment = new UnifiedXamlComment
+        {
+            Text = xComment.Value,
+            Parent = parent,
+            Location = ExtractLocation(xComment)
+        };
+
+        // Determine comment position based on surrounding nodes
+        if (xComment.Parent is XElement parentElement)
+        {
+            var previousSibling = xComment.PreviousNode;
+            var nextSibling = xComment.NextNode;
+
+            if (previousSibling == null && nextSibling != null)
+            {
+                // First node within parent - before content
+                comment.Position = CommentPosition.WithinContent;
+            }
+            else if (nextSibling == null && previousSibling != null)
+            {
+                // Last node within parent - after content
+                comment.Position = CommentPosition.WithinContent;
+            }
+            else if (previousSibling != null && nextSibling != null)
+            {
+                // Between elements - within content
+                comment.Position = CommentPosition.WithinContent;
+            }
+            else
+            {
+                // Standalone
+                comment.Position = CommentPosition.Standalone;
+            }
+        }
+        else
+        {
+            // Document-level comment
+            comment.Position = CommentPosition.Standalone;
+        }
+
+        return comment;
     }
 
     /// <summary>
@@ -153,14 +264,18 @@ public sealed class XmlToUnifiedConverter
         if (IsMarkupExtension(value))
         {
             property.MarkupExtension = ParseMarkupExtension(value, property);
+            SetPropertyValue(property, property.MarkupExtension);
         }
         else
         {
-            property.Value = value;
+            SetPropertyValue(property, value);
         }
 
         // Extract location
         property.Location = ExtractLocation(attribute);
+
+        // Extract formatting hints for attributes
+        property.Formatting = ExtractAttributeFormatting(attribute, parent);
 
         return property;
     }
@@ -202,15 +317,18 @@ public sealed class XmlToUnifiedConverter
             if (children.Count == 1)
             {
                 // Single child: set as property value directly
-                property.Value = ConvertElement(children[0], parent, 0);
+                var childElement = ConvertElement(children[0], parent, 0);
+                SetPropertyValue(property, childElement);
             }
             else if (children.Count > 1)
             {
                 // Multiple children: create a collection element
                 var collectionElement = new UnifiedXamlElement
                 {
+                    #pragma warning disable CS0618
                     TypeName = fullName, // e.g., "Window.Resources"
-                    XmlElement = element,
+                    #pragma warning restore CS0618
+                    SourceXmlElement = element,
                     XmlNode = element,
                     Parent = parent,
                     Location = ExtractLocation(element),
@@ -224,7 +342,7 @@ public sealed class XmlToUnifiedConverter
                     collectionElement.AddChild(child);
                 }
 
-                property.Value = collectionElement;
+                SetPropertyValue(property, collectionElement);
             }
         }
         else if (!string.IsNullOrWhiteSpace(element.Value))
@@ -234,10 +352,11 @@ public sealed class XmlToUnifiedConverter
             if (IsMarkupExtension(value))
             {
                 property.MarkupExtension = ParseMarkupExtension(value, property);
+                SetPropertyValue(property, property.MarkupExtension);
             }
             else
             {
-                property.Value = value;
+                SetPropertyValue(property, value);
             }
         }
 
@@ -435,33 +554,52 @@ public sealed class XmlToUnifiedConverter
     /// </summary>
     private FormattingHints ExtractFormatting(XElement element)
     {
-        var hints = new FormattingHints();
+        // Use source-based extraction if available for 100% accurate whitespace preservation
+        if (_whitespaceExtractor != null)
+        {
+            var hints = _whitespaceExtractor.ExtractElementFormatting(element);
+
+            // Capture comments
+            hints.AssociatedComments.AddRange(
+                element.Nodes()
+                    .OfType<XComment>()
+                    .Concat(element.DescendantNodes().OfType<XComment>())
+            );
+
+            // Capture original text for full preservation
+            hints.OriginalText = element.ToString();
+
+            return hints;
+        }
+
+        // Fallback to node-based extraction
+        var fallbackHints = new FormattingHints();
 
         // Capture original text for full preservation
-        hints.OriginalText = element.ToString();
+        fallbackHints.OriginalText = element.ToString();
 
         // Detect whitespace patterns
         var previousNode = element.PreviousNode;
         if (previousNode is XText textBefore)
         {
-            hints.LeadingWhitespace = NormalizeLeadingWhitespace(textBefore.Value);
+            fallbackHints.LeadingWhitespace = NormalizeLeadingWhitespace(textBefore.Value);
         }
 
         var nextNode = element.NextNode;
         if (nextNode is XText textAfter)
         {
-            hints.TrailingWhitespace = NormalizeTrailingWhitespace(textAfter.Value);
-            hints.HasNewlineAfter = textAfter.Value.Contains('\n');
+            fallbackHints.TrailingWhitespace = NormalizeTrailingWhitespace(textAfter.Value);
+            fallbackHints.HasNewlineAfter = textAfter.Value.Contains('\n');
         }
 
         // Capture comments
-        hints.AssociatedComments.AddRange(
+        fallbackHints.AssociatedComments.AddRange(
             element.Nodes()
                 .OfType<XComment>()
                 .Concat(element.DescendantNodes().OfType<XComment>())
         );
 
-        return hints;
+        return fallbackHints;
     }
 
     /// <summary>
@@ -516,6 +654,99 @@ public sealed class XmlToUnifiedConverter
 
         // Just a newline
         return "\n";
+    }
+
+    /// <summary>
+    /// Extracts formatting hints for attributes by parsing the element's XML string.
+    /// Determines if the attribute should be on a new line based on the source formatting.
+    /// </summary>
+    private FormattingHints ExtractAttributeFormatting(XAttribute attribute, UnifiedXamlElement parent)
+    {
+        // Use source-based extraction if available for 100% accurate attribute whitespace preservation
+        if (_whitespaceExtractor != null && parent.SourceXmlElement != null)
+        {
+            return _whitespaceExtractor.ExtractAttributeFormatting(attribute, parent.SourceXmlElement);
+        }
+
+        // Fallback to string-based extraction
+        var hints = new FormattingHints();
+
+        try
+        {
+            // Get the XML string of the parent element
+            var xmlString = parent.SourceXmlElement?.ToString();
+            if (string.IsNullOrEmpty(xmlString))
+                return hints;
+
+            // Find this attribute in the XML string
+            var attributePattern = $@"{System.Text.RegularExpressions.Regex.Escape(attribute.Name.LocalName)}\s*=\s*""";
+            var match = System.Text.RegularExpressions.Regex.Match(xmlString, attributePattern);
+
+            if (match.Success)
+            {
+                // Look backwards from the match to find the preceding whitespace
+                var precedingText = xmlString.Substring(0, match.Index);
+                var lastNewlineIndex = precedingText.LastIndexOf('\n');
+
+                if (lastNewlineIndex >= 0)
+                {
+                    // Extract whitespace from last newline to the attribute
+                    var whitespace = precedingText.Substring(lastNewlineIndex);
+                    hints.LeadingWhitespace = whitespace;
+                    hints.PreserveLineBreak = true;
+                }
+                else
+                {
+                    // Attribute is on the same line as opening tag
+                    // Check if there's whitespace before it
+                    var precedingChar = precedingText.Length > 0 ? precedingText[^1] : '\0';
+                    if (char.IsWhiteSpace(precedingChar))
+                    {
+                        hints.LeadingWhitespace = " ";
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // If extraction fails, return empty hints (will use default spacing)
+        }
+
+        return hints;
+    }
+
+    /// <summary>
+    /// Sets the property value using both legacy and strongly-typed fields for backwards compatibility.
+    /// </summary>
+    private void SetPropertyValue(UnifiedXamlProperty property, object? value)
+    {
+        // Set legacy Value field for backwards compatibility
+        #pragma warning disable CS0618 // Type or member is obsolete
+        property.Value = value;
+        #pragma warning restore CS0618
+
+        // Set strongly-typed ValueTyped field
+        if (value == null)
+        {
+            property.ValueTyped = PropertyValue.Null();
+        }
+        else if (value is string str)
+        {
+            property.ValueTyped = PropertyValue.FromString(str);
+        }
+        else if (value is UnifiedXamlElement element)
+        {
+            property.ValueTyped = PropertyValue.FromElement(element);
+        }
+        else if (value is UnifiedXamlMarkupExtension extension)
+        {
+            property.ValueTyped = PropertyValue.FromMarkupExtension(extension);
+        }
+        else
+        {
+            // Fallback for unexpected types - convert to string
+            property.ValueTyped = PropertyValue.FromString(value.ToString() ?? string.Empty);
+        }
     }
 
     /// <summary>

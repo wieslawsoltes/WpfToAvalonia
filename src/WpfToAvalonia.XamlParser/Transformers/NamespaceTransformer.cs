@@ -65,11 +65,11 @@ public class NamespaceTransformer : IXamlTransformer
 
             element.Namespace = avaloniaNamespace;
 
-            // Update XML namespace if XmlElement is present
-            if (element.XmlElement != null && element.XmlNamespace != null)
+            // Update XML namespace if SourceXmlElement is present
+            if (element.SourceXmlElement != null && element.XmlNamespace != null)
             {
                 // Note: XNamespace cannot be modified directly
-                // The XmlElement will need to be recreated during serialization
+                // The SourceXmlElement will need to be recreated during serialization
                 element.XmlNamespace = avaloniaNamespace;
             }
 
